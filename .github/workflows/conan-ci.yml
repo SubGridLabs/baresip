@@ -146,7 +146,7 @@ jobs:
 
           # Upload any newly built dependencies to artifactory
           echo "Uploading multimedia dependencies to Artifactory..."
-          conan list "*:*" --format=compact | grep -v "baresip/" | while read pkg; do
+          conan list "*:*" --format=compact | grep -v "baresip/" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | while read pkg; do
             if [ ! -z "$pkg" ]; then
               echo "Uploading dependency: $pkg"
               conan upload "$pkg" -r artifactory -c || echo "Failed to upload $pkg, continuing..."
@@ -172,7 +172,7 @@ jobs:
           
           # Upload any newly built dependencies to artifactory
           echo "Uploading multimedia dependencies to Artifactory..."
-          $packages = conan list "*:*" --format=compact | Where-Object { $_ -notmatch "baresip/" }
+          $packages = conan list "*:*" --format=compact | Where-Object { $_ -notmatch "baresip/" } | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
           foreach ($pkg in $packages) {
             if ($pkg) {
               echo "Uploading dependency: $pkg"
@@ -238,7 +238,7 @@ jobs:
             --build=missing
 
           # Upload any new video dependencies
-          conan list "*:*" --format=compact | grep -v "baresip/" | while read pkg; do
+          conan list "*:*" --format=compact | grep -v "baresip/" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | while read pkg; do
             if [ ! -z "$pkg" ]; then
               echo "Uploading video dependency: $pkg"
               conan upload "$pkg" -r artifactory -c || echo "Failed to upload $pkg, continuing..."

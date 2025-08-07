@@ -107,8 +107,10 @@ jobs:
         
         # Create optimized profile
         mkdir -p ~/.conan2/profiles
-        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-          echo "✅ Creating Linux profile for ${{ matrix.os }}"
+        
+        # Use runner.os as primary and matrix.os as secondary check
+        if [[ "${{ runner.os }}" == "Linux" ]] || [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          echo "✅ Creating Linux profile (runner.os=${{ runner.os }}, matrix.os=${{ matrix.os }})"
           cat > ~/.conan2/profiles/ci << 'EOF'
         [settings]
         os=Linux
@@ -118,8 +120,8 @@ jobs:
         compiler.libcxx=libstdc++11
         build_type=Release
         EOF
-        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-          echo "✅ Creating macOS profile for ${{ matrix.os }}"
+        elif [[ "${{ runner.os }}" == "macOS" ]] || [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          echo "✅ Creating macOS profile (runner.os=${{ runner.os }}, matrix.os=${{ matrix.os }})"
           cat > ~/.conan2/profiles/ci << 'EOF'
         [settings]
         os=Macos
@@ -133,13 +135,32 @@ jobs:
         CXX=clang++
         EOF
         else
-          echo "❌ Unknown OS: ${{ matrix.os }}"
+          echo "❌ Unknown OS: runner.os=${{ runner.os }}, matrix.os=${{ matrix.os }}"
           exit 1
         fi
         
         echo "=== Generated profile contents ==="
         cat ~/.conan2/profiles/ci
         echo "=== End profile ==="
+        
+        # Validate profile for this runner
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          if ! grep -q "os=Linux" ~/.conan2/profiles/ci; then
+            echo "❌ ERROR: Linux runner but profile doesn't contain os=Linux"
+            echo "Profile contents:"
+            cat ~/.conan2/profiles/ci
+            exit 1
+          fi
+          echo "✅ Profile validation passed for Linux runner"
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          if ! grep -q "os=Macos" ~/.conan2/profiles/ci; then
+            echo "❌ ERROR: macOS runner but profile doesn't contain os=Macos"
+            echo "Profile contents:"
+            cat ~/.conan2/profiles/ci
+            exit 1
+          fi
+          echo "✅ Profile validation passed for macOS runner"
+        fi
         
     - name: Setup Conan remotes
       run: |

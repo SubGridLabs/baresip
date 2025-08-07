@@ -119,7 +119,7 @@ jobs:
         arch=${{ matrix.arch }}
         compiler=apple-clang
         compiler.version=15
-        compiler.libcxx=libstdc++11
+        compiler.libcxx=libc++
         build_type=Release
         [buildenv]
         CC=clang
@@ -158,8 +158,11 @@ jobs:
       run: |
         echo "Building ${{ matrix.name }} with options: ${{ matrix.options }}"
         
+        # Build the conan create command with proper option handling
+        OPTIONS="${{ matrix.options }}"
+        
         # Try to build with existing packages first
-        if ! conan create . --profile:build=ci --profile:host=ci ${{ matrix.options }} --build=missing; then
+        if ! conan create . --profile:build=ci --profile:host=ci ${OPTIONS} --build=missing; then
           echo "⚠️ Build failed, likely due to missing libre/4.0.0"
           echo "🔧 Attempting to build libre from source as fallback..."
           

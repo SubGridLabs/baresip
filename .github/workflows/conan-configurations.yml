@@ -148,7 +148,7 @@ jobs:
               arch=armv8
               compiler=apple-clang
               compiler.version=15
-              compiler.libcxx=libstdc++11
+              compiler.libcxx=libc++
               build_type=Release
             options: >
               -o with_ffmpeg=False
@@ -165,7 +165,7 @@ jobs:
               arch=x86_64
               compiler=apple-clang
               compiler.version=15
-              compiler.libcxx=libstdc++11
+              compiler.libcxx=libc++
               build_type=Release
             options: >
               -o with_ffmpeg=False

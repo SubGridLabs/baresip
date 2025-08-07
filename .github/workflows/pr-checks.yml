@@ -223,9 +223,6 @@ jobs:
         # Build the conan create command with proper option handling
         OPTIONS="${{ matrix.options }}"
         
-        echo "=== Ensuring Artifactory authentication ==="
-        conan remote login artifactory builder
-        
         echo "=== Checking available packages before build ==="
         conan list "*ffmpeg*" --remote=artifactory || echo "No ffmpeg packages in artifactory"
         conan list "*ffmpeg*" --remote=conancenter || echo "No ffmpeg packages in conancenter"

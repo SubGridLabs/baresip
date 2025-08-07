@@ -262,7 +262,7 @@ jobs:
         
         # Get package path and verify contents
         echo "=== Finding package reference ==="
-        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | head -1 | tr -d ' ')
+        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1 | tr -d ' ')
         echo "Found package reference: '$PKG_REF'"
         
         if [ ! -z "$PKG_REF" ] && [[ "$PKG_REF" == *"baresip/4.0.0"* ]]; then

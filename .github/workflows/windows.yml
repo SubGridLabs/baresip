@@ -21,8 +21,8 @@ jobs:
             os: windows-2022,
             environment_script: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat",
             build: "Debug",
-            openssl: true,
-            disable_openssl: "OFF",
+            openssl: false,
+            disable_openssl: "ON",
             testing: true
           }
         - {
@@ -30,8 +30,8 @@ jobs:
             os: windows-2022,
             environment_script: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat",
             build: "Release",
-            openssl: true,
-            disable_openssl: "OFF",
+            openssl: false,
+            disable_openssl: "ON",
             testing: true
           }
         - {
@@ -47,10 +47,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install OpenSSL
-        if: ${{ matrix.config.openssl }}
-        run: |
-          choco install --no-progress ${{ matrix.config.choco }} openssl
+      # OpenSSL installation removed - now handled by Conan in conan-ci.yml workflow
+      # This prevents conflicts between system OpenSSL and Conan-managed OpenSSL
 
       - uses: sreimers/pr-dependency-action@v1
         with:

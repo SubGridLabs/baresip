@@ -265,9 +265,21 @@ jobs:
           
           # Upload any newly built dependencies to artifactory
           echo "Uploading multimedia dependencies to Artifactory..."
-          $packages = conan list "*:*" --format=compact | Where-Object { $_ -notmatch "baresip/" } | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+          # Enhanced parsing to filter out metadata and headers
+          $rawOutput = conan list "*:*" --format=compact
+          $packages = $rawOutput | Where-Object { 
+            $_ -and                                    # Not null/empty
+            $_.Trim() -ne "" -and                     # Not empty after trim
+            $_ -notmatch "baresip/" -and              # Not baresip packages
+            $_ -notmatch "^Local Cache" -and          # Not header
+            $_ -notmatch "^settings:" -and            # Not settings metadata
+            $_ -notmatch "^options:" -and             # Not options metadata
+            $_ -match "^[a-zA-Z0-9_-]+/[0-9]" -and    # Proper package format (name/version)
+            $_ -match ":"                             # Must contain colon for package ID
+          } | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+          
           foreach ($pkg in $packages) {
-            if ($pkg) {
+            if ($pkg -and $pkg.Length -gt 0) {
               echo "Uploading dependency: $pkg"
               conan upload "$pkg" -r artifactory -c
               if ($LASTEXITCODE -ne 0) {

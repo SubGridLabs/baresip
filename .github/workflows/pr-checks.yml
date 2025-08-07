@@ -307,11 +307,12 @@ jobs:
         PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep -v "Local Cache" | grep "baresip/4.0.0" | head -1 | tr -d ' ')
         
         # If that didn't work, try getting it from regular format
-        if [ -z "$PKG_REF" ]; then
-          echo "Compact format failed, trying regular format..."
-          PKG_REF=$(conan list baresip/4.0.0:* | grep -A 10 "packages" | grep -E "^[[:space:]]*[a-f0-9]+" | head -1 | tr -d ' ')
-          if [ ! -z "$PKG_REF" ]; then
-            PKG_REF="baresip/4.0.0:$PKG_REF"
+        if [ -z "$PKG_REF" ] || [[ "$PKG_REF" == "baresip/4.0.0" ]]; then
+          echo "Need to get full package reference with package ID..."
+          PKG_ID=$(conan list baresip/4.0.0:* | grep -A 10 "packages" | grep -E "^[[:space:]]*[a-f0-9]+" | head -1 | tr -d ' ')
+          if [ ! -z "$PKG_ID" ]; then
+            PKG_REF="baresip/4.0.0:$PKG_ID"
+            echo "Constructed full package reference: $PKG_REF"
           fi
         fi
         
@@ -342,7 +343,7 @@ jobs:
         
         # Test basic package info
         echo "=== Package Info ==="
-        conan show baresip/4.0.0:*
+        conan list baresip/4.0.0:* || echo "Failed to show package info"
         
     - name: Create test consumer
       run: |

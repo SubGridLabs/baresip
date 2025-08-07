@@ -188,8 +188,13 @@ jobs:
         # Build the conan create command with proper option handling
         OPTIONS="${{ matrix.options }}"
         
-        # Try to build with existing packages first
-        if ! conan create . --profile:build=ci --profile:host=ci ${OPTIONS} --build=missing; then
+        echo "=== Checking available packages before build ==="
+        conan list "*ffmpeg*" --remote=artifactory || echo "No ffmpeg packages in artifactory"
+        conan list "*ffmpeg*" --remote=conancenter || echo "No ffmpeg packages in conancenter"
+        
+        echo "=== Attempting to build with dependency resolution ==="
+        # Try to build with existing packages first, with verbose output
+        if ! conan create . --profile:build=ci --profile:host=ci ${OPTIONS} --build=missing -v; then
           echo "⚠️ Build failed, likely due to missing libre/4.0.0"
           echo "🔧 Attempting to build libre from source as fallback..."
           
@@ -252,14 +257,22 @@ jobs:
     - name: Test package functionality
       run: |
         # Verify package was created
+        echo "=== Checking for baresip package ==="
         conan list baresip/4.0.0:*
         
         # Get package path and verify contents
-        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1)
-        if [ ! -z "$PKG_REF" ]; then
+        echo "=== Finding package reference ==="
+        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | head -1 | tr -d ' ')
+        echo "Found package reference: '$PKG_REF'"
+        
+        if [ ! -z "$PKG_REF" ] && [[ "$PKG_REF" == *"baresip/4.0.0"* ]]; then
+          echo "=== Getting package path ==="
           PKG_PATH=$(conan cache path "$PKG_REF")
+          echo "Package path: $PKG_PATH"
         else
-          echo "No package reference found"
+          echo "No valid package reference found"
+          echo "Available packages:"
+          conan list baresip/*
           exit 1
         fi
         

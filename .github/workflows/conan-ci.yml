@@ -190,6 +190,10 @@ jobs:
 
           # Upload the baresip package
           conan upload "baresip/*" -r artifactory -c
+          
+          # Show package information (now that it exists)
+          echo "=== Baresip Package Created ==="
+          conan list baresip/4.0.0:* || echo "Package not found in local cache"
 
       - name: Test minimal configuration
         if: matrix.profile != 'windows-x64'
@@ -248,13 +252,10 @@ jobs:
           # Upload the video variant
           conan upload "baresip/*" -r artifactory -c
 
-      - name: Package information
+      - name: Show available dependencies
         run: |
-          echo "=== Baresip Conan Package Info ==="
-          conan list baresip/4.0.0:*
-          echo ""
-          echo "=== All multimedia dependencies ==="
-          conan list "*:*" --format=compact
+          echo "=== Multimedia dependencies available ==="
+          conan list "*:*" --format=compact | grep -v "baresip/" || echo "No dependencies found yet"
 
   quality:
     runs-on: ubuntu-latest

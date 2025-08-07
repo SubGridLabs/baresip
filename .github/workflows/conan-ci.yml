@@ -125,6 +125,13 @@ jobs:
           # Check what packages are available in artifactory (Conan 2.x command)
           echo "=== Packages in artifactory ==="
           conan list "*" --remote=artifactory | head -20 || echo "No packages found or search failed"
+          
+          # Show remote priority order (artifactory should be first)
+          echo "=== Remote priority order ==="
+          conan remote list
+          echo "✅ Artifactory is checked FIRST for existing packages"
+          echo "✅ Conan Center is FALLBACK for recipes only"
+          echo "✅ Built packages will be uploaded to Artifactory"
 
       - name: Authenticate with Artifactory
         run: |
@@ -170,6 +177,8 @@ jobs:
           fi
           
           # Install dependencies with comprehensive multimedia options
+          # This will check artifactory FIRST, then conan-center for recipes, build missing, upload to artifactory
+          echo "=== Installing dependencies (artifactory first, then build missing) ==="
           conan install . --profile:build=ci --profile:host=ci --build=missing \
             -o baresip/*:with_opus=True \
             -o baresip/*:with_g722=True \

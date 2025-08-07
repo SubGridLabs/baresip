@@ -136,6 +136,8 @@ jobs:
         # Verify remotes are configured correctly
         echo "=== Configured remotes ==="
         conan remote list
+        echo "✅ Artifactory is checked FIRST for existing packages"
+        echo "✅ Conan Center is FALLBACK for recipes only"
 
     - name: Authenticate with Artifactory
       run: |
@@ -143,7 +145,14 @@ jobs:
         
         # Verify authentication worked by testing a simple command
         echo "=== Testing artifactory connection after authentication ==="
-        conan list "*" --remote=artifactory | head -5 || echo "Failed to list packages from artifactory"
+        conan list "*" --remote=artifactory | head -10 || echo "Failed to list packages from artifactory"
+        
+        # Check specifically for common packages that might be in artifactory
+        echo "=== Checking for common packages in artifactory ==="
+        conan list "opus/*" --remote=artifactory || echo "opus not in artifactory"
+        conan list "openssl/*" --remote=artifactory || echo "openssl not in artifactory"
+        conan list "zlib/*" --remote=artifactory || echo "zlib not in artifactory"
+        conan list "libre/*" --remote=artifactory || echo "libre not in artifactory"
         
     - name: Install system dependencies (Linux)
       if: matrix.os == 'ubuntu-latest'

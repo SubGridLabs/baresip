@@ -140,7 +140,7 @@ jobs:
             -o baresip/*:with_openssl=True \
             -o baresip/*:with_gstreamer=True \
             -o baresip/*:with_sdl=True \
-            -o baresip/*:with_mosquitto=True \
+            -o baresip/*:with_mosquitto=False \
             -o baresip/*:with_png=True \
             -o baresip/*:with_sndfile=True
 
@@ -166,7 +166,7 @@ jobs:
             -o baresip/*:with_av1=True `
             -o baresip/*:with_openssl=True `
             -o baresip/*:with_sdl=True `
-            -o baresip/*:with_mosquitto=True `
+            -o baresip/*:with_mosquitto=False `
             -o baresip/*:with_png=True `
             -o baresip/*:with_sndfile=True
           

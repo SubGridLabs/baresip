@@ -202,8 +202,10 @@ class BaresipConan(ConanFile):
         if self.options.with_sdl:
             self.requires("sdl/2.30.8")
             
-        if self.options.with_mosquitto:
-            self.requires("mosquitto/2.0.21")
+        # Mosquitto removed - not reliably available across all platforms in Conan Center
+        # Users can install mosquitto via system package managers if MQTT support is needed
+        # if self.options.with_mosquitto:
+        #     self.requires("mosquitto/2.0.21")
             
         if self.options.with_png:
             self.requires("libpng/[>=1.6 <2]")

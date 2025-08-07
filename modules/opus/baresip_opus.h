@@ -5,8 +5,6 @@
  */
 
 
-
-
 struct opus_param {
 	opus_int32 srate;
 	opus_int32 bitrate;

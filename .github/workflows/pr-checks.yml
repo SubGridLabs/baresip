@@ -205,6 +205,7 @@ jobs:
           build-essential \
           cmake \
           pkg-config \
+          libc++-dev libc++abi-dev \
           libasound2-dev \
           libpulse-dev \
           portaudio19-dev

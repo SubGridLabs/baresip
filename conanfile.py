@@ -107,8 +107,6 @@ class BaresipConan(ConanFile):
             self.options.with_pipewire = False
             # No GTK on macOS by default
             self.options.with_gtk = False
-            # Mosquitto not available in Conan Center for macOS
-            self.options.with_mosquitto = False
             
         elif self.settings.os == "Windows":
             # Windows audio systems
@@ -119,8 +117,6 @@ class BaresipConan(ConanFile):
             self.options.with_pipewire = False
             # No GTK on Windows by default
             self.options.with_gtk = False
-            # Mosquitto not available in Conan Center for Windows
-            self.options.with_mosquitto = False
             
         elif self.settings.os == "iOS":
             # iOS has very limited system access - minimal configuration
@@ -184,7 +180,8 @@ class BaresipConan(ConanFile):
             pass  # Will be found by the Find module
             
         if self.options.with_pulseaudio and self.settings.os == "Linux":
-            self.requires("pulseaudio/17.0")
+            # Use version range to avoid conflicts with SDL2
+            self.requires("pulseaudio/[>=14.0 <18]")
             
         if self.options.with_jack:
             # JACK is typically system-installed
@@ -206,12 +203,7 @@ class BaresipConan(ConanFile):
             self.requires("sdl/2.30.8")
             
         if self.options.with_mosquitto:
-            # Mosquitto is only available in Conan Center for Linux
-            if self.settings.os == "Linux":
-                self.requires("mosquitto/2.0.21")
-            else:
-                # On macOS/Windows, use system-installed mosquitto or disable MQTT support
-                self.output.info("MQTT support requires system-installed mosquitto on macOS/Windows")
+            self.requires("mosquitto/2.0.21")
             
         if self.options.with_png:
             self.requires("libpng/[>=1.6 <2]")

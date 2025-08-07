@@ -138,8 +138,8 @@ if(BARESIP_USE_CONAN)
         
         # Extract actual path from generator expression like $<$<CONFIG:Debug>:/path>
         string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
-        # Conan puts headers in include/re/, but we need to point to the re subdirectory
-        set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}/re")
+        # Conan puts headers in include/re/, so we use the base include directory
+        set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}")
         message(STATUS "DEBUG: Processed RE_INCLUDE_DIRS = ${RE_INCLUDE_DIRS}")
     else()
         find_package(re CONFIG REQUIRED HINTS ../re/cmake)

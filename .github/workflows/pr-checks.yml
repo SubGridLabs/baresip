@@ -95,6 +95,11 @@ jobs:
         
     - name: Configure Conan
       run: |
+        echo "=== Configuring Conan profiles ==="
+        echo "Matrix OS: ${{ matrix.os }}"
+        echo "Matrix arch: ${{ matrix.arch }}"
+        echo "Runner OS: ${{ runner.os }}"
+        
         conan profile detect --force
         
         # Add SubGridLabs remote for shared packages (if available)
@@ -103,6 +108,7 @@ jobs:
         # Create optimized profile
         mkdir -p ~/.conan2/profiles
         if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          echo "✅ Creating Linux profile for ${{ matrix.os }}"
           cat > ~/.conan2/profiles/ci << 'EOF'
         [settings]
         os=Linux
@@ -113,6 +119,7 @@ jobs:
         build_type=Release
         EOF
         elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          echo "✅ Creating macOS profile for ${{ matrix.os }}"
           cat > ~/.conan2/profiles/ci << 'EOF'
         [settings]
         os=Macos
@@ -125,7 +132,14 @@ jobs:
         CC=clang
         CXX=clang++
         EOF
+        else
+          echo "❌ Unknown OS: ${{ matrix.os }}"
+          exit 1
         fi
+        
+        echo "=== Generated profile contents ==="
+        cat ~/.conan2/profiles/ci
+        echo "=== End profile ==="
         
     - name: Setup Conan remotes
       run: |

@@ -98,7 +98,9 @@ jobs:
         echo "=== Configuring Conan profiles ==="
         echo "Matrix OS: ${{ matrix.os }}"
         echo "Matrix arch: ${{ matrix.arch }}"
+        echo "Matrix name: ${{ matrix.name }}"
         echo "Runner OS: ${{ runner.os }}"
+        echo "RUNNER_OS env: $RUNNER_OS"
         
         conan profile detect --force
         
@@ -108,24 +110,53 @@ jobs:
         # Create optimized profile
         mkdir -p ~/.conan2/profiles
         
-        # Use runner.os as primary and matrix.os as secondary check
-        if [[ "${{ runner.os }}" == "Linux" ]] || [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-          echo "✅ Creating Linux profile (runner.os=${{ runner.os }}, matrix.os=${{ matrix.os }})"
-          cat > ~/.conan2/profiles/ci << 'EOF'
+        # Enhanced conditional logic - check for Linux first
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          echo "✅ Creating Linux profile - detected runner.os=Linux"
+          PROFILE_OS="Linux"
+          PROFILE_ARCH="${{ matrix.arch }}"
+        elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          echo "✅ Creating Linux profile - detected matrix.os=ubuntu-latest"
+          PROFILE_OS="Linux"
+          PROFILE_ARCH="${{ matrix.arch }}"
+        elif [[ "${{ matrix.name }}" == *"Linux"* ]]; then
+          echo "✅ Creating Linux profile - detected Linux in matrix.name"
+          PROFILE_OS="Linux"
+          PROFILE_ARCH="${{ matrix.arch }}"
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          echo "✅ Creating macOS profile - detected runner.os=macOS"
+          PROFILE_OS="macOS"
+          PROFILE_ARCH="${{ matrix.arch }}"
+        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          echo "✅ Creating macOS profile - detected matrix.os=macos-latest"
+          PROFILE_OS="macOS"
+          PROFILE_ARCH="${{ matrix.arch }}"
+        else
+          echo "❌ Unknown OS configuration:"
+          echo "  runner.os=${{ runner.os }}"
+          echo "  matrix.os=${{ matrix.os }}"
+          echo "  matrix.name=${{ matrix.name }}"
+          echo "  RUNNER_OS=$RUNNER_OS"
+          exit 1
+        fi
+        
+        echo "=== Profile decision: OS=$PROFILE_OS, ARCH=$PROFILE_ARCH ==="
+        
+        if [[ "$PROFILE_OS" == "Linux" ]]; then
+          cat > ~/.conan2/profiles/ci << EOF
         [settings]
         os=Linux
-        arch=${{ matrix.arch }}
+        arch=$PROFILE_ARCH
         compiler=gcc
         compiler.version=11
         compiler.libcxx=libstdc++11
         build_type=Release
         EOF
-        elif [[ "${{ runner.os }}" == "macOS" ]] || [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-          echo "✅ Creating macOS profile (runner.os=${{ runner.os }}, matrix.os=${{ matrix.os }})"
-          cat > ~/.conan2/profiles/ci << 'EOF'
+        elif [[ "$PROFILE_OS" == "macOS" ]]; then
+          cat > ~/.conan2/profiles/ci << EOF
         [settings]
         os=Macos
-        arch=${{ matrix.arch }}
+        arch=$PROFILE_ARCH
         compiler=apple-clang
         compiler.version=15
         compiler.libcxx=libc++
@@ -135,7 +166,7 @@ jobs:
         CXX=clang++
         EOF
         else
-          echo "❌ Unknown OS: runner.os=${{ runner.os }}, matrix.os=${{ matrix.os }}"
+          echo "❌ Invalid PROFILE_OS: $PROFILE_OS"
           exit 1
         fi
         

@@ -238,8 +238,8 @@ jobs:
           -o with_sdl=False \
           --build=missing
           
-        MINIMAL_PKG=$(conan list baresip/4.0.0:* --format=compact | head -1)
-        MINIMAL_PATH=$(conan cache path $MINIMAL_PKG)
+        MINIMAL_PKG=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1)
+        MINIMAL_PATH=$(conan cache path "$MINIMAL_PKG")
         MINIMAL_SIZE=$(du -sh "$MINIMAL_PATH" | cut -f1)
         
         echo "=== Building Full Configuration ==="
@@ -251,8 +251,8 @@ jobs:
           -o with_sdl=True \
           --build=missing
           
-        FULL_PKG=$(conan list baresip/4.0.0:* --format=compact | tail -1)
-        FULL_PATH=$(conan cache path $FULL_PKG)
+        FULL_PKG=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | tail -1)
+        FULL_PATH=$(conan cache path "$FULL_PKG")
         FULL_SIZE=$(du -sh "$FULL_PATH" | cut -f1)
         
         # Generate summary

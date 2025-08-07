@@ -180,8 +180,8 @@ class BaresipConan(ConanFile):
             pass  # Will be found by the Find module
             
         if self.options.with_pulseaudio and self.settings.os == "Linux":
-            # Use version range to avoid conflicts with SDL2
-            self.requires("pulseaudio/[>=14.0 <18]")
+            # Use the same version that SDL2 requires to avoid conflicts
+            self.requires("pulseaudio/14.2")
             
         if self.options.with_jack:
             # JACK is typically system-installed
@@ -214,7 +214,8 @@ class BaresipConan(ConanFile):
             self.requires("libsndfile/[>=1.0 <2]")
     
     def build_requirements(self):
-        self.tool_requires("cmake/[>=3.15 <4]")
+        # Use CMake 3.27.9 for compatibility with all dependencies including bzip2
+        self.tool_requires("cmake/3.27.9")
     
     def layout(self):
         cmake_layout(self)

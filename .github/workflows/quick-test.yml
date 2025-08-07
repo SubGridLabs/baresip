@@ -65,7 +65,8 @@ jobs:
         conan list baresip/4.0.0:*
         
         # Check if executable exists in package
-        PKG_PATH=$(conan cache path $(conan list baresip/4.0.0:* --format=compact | head -1))
+        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1)
+        PKG_PATH=$(conan cache path "$PKG_REF")
         if [[ -f "$PKG_PATH/bin/baresip" ]]; then
           echo "✅ baresip executable found in package"
         else

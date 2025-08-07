@@ -124,7 +124,7 @@ jobs:
       - name: Setup Conan remotes
         run: |
           conan remote add artifactory ${{ secrets.CONAN_REMOTE_URL }} --force
-          conan remote add conancenter https://center.conan.io --force
+          conan remote add conancenter https://center2.conan.io --force
 
       - name: Authenticate with Artifactory
         run: |

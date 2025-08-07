@@ -225,8 +225,13 @@ jobs:
         conan list baresip/4.0.0:*
         
         # Get package path and verify contents
-        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | head -1)
-        PKG_PATH=$(conan cache path "$PKG_REF")
+        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1)
+        if [ ! -z "$PKG_REF" ]; then
+          PKG_PATH=$(conan cache path "$PKG_REF")
+        else
+          echo "No package reference found"
+          exit 1
+        fi
         
         echo "Package contents:"
         find "$PKG_PATH" -name "baresip*" -type f | head -10

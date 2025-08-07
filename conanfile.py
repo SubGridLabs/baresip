@@ -219,8 +219,11 @@ class BaresipConan(ConanFile):
             self.requires("libsndfile/[>=1.0 <2]")
 
     def build_requirements(self):
-        # Use CMake 3.27.9 for compatibility with all deps including bzip2
-        self.tool_requires("cmake/3.27.9")
+        # Use system cmake on Linux/macOS when available, Conan cmake for Windows
+        # This avoids issues with corrupted cmake packages for some platforms
+        if self.settings.os == "Windows":
+            # Use CMake 3.27.9 for compatibility with all deps including bzip2
+            self.tool_requires("cmake/3.27.9")
 
     def layout(self):
         cmake_layout(self)

@@ -132,17 +132,33 @@ jobs:
           echo "Building baresip dependencies and uploading missing packages..."
           
           # Install dependencies with comprehensive multimedia options
-          conan install . --profile:build=ci --profile:host=ci --build=missing \
-            -o baresip/*:with_opus=True \
-            -o baresip/*:with_g722=True \
-            -o baresip/*:with_g711=True \
-            -o baresip/*:with_av1=True \
-            -o baresip/*:with_openssl=True \
-            -o baresip/*:with_gstreamer=True \
-            -o baresip/*:with_sdl=True \
-            -o baresip/*:with_mosquitto=True \
-            -o baresip/*:with_png=True \
-            -o baresip/*:with_sndfile=True
+          if [[ "${{ matrix.profile }}" == "linux-"* ]]; then
+            # Linux supports all features including MQTT
+            conan install . --profile:build=ci --profile:host=ci --build=missing \
+              -o baresip/*:with_opus=True \
+              -o baresip/*:with_g722=True \
+              -o baresip/*:with_g711=True \
+              -o baresip/*:with_av1=True \
+              -o baresip/*:with_openssl=True \
+              -o baresip/*:with_gstreamer=True \
+              -o baresip/*:with_sdl=True \
+              -o baresip/*:with_mosquitto=True \
+              -o baresip/*:with_png=True \
+              -o baresip/*:with_sndfile=True
+          else
+            # macOS/Windows - disable mosquitto (not available in Conan Center)
+            conan install . --profile:build=ci --profile:host=ci --build=missing \
+              -o baresip/*:with_opus=True \
+              -o baresip/*:with_g722=True \
+              -o baresip/*:with_g711=True \
+              -o baresip/*:with_av1=True \
+              -o baresip/*:with_openssl=True \
+              -o baresip/*:with_gstreamer=True \
+              -o baresip/*:with_sdl=True \
+              -o baresip/*:with_mosquitto=False \
+              -o baresip/*:with_png=True \
+              -o baresip/*:with_sndfile=True
+          fi
 
           # Upload any newly built dependencies to artifactory
           echo "Uploading multimedia dependencies to Artifactory..."
@@ -166,7 +182,7 @@ jobs:
             -o baresip/*:with_av1=True `
             -o baresip/*:with_openssl=True `
             -o baresip/*:with_sdl=True `
-            -o baresip/*:with_mosquitto=True `
+            -o baresip/*:with_mosquitto=False `
             -o baresip/*:with_png=True `
             -o baresip/*:with_sndfile=True
           

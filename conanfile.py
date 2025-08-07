@@ -214,7 +214,7 @@ class BaresipConan(ConanFile):
             self.requires("libsndfile/[>=1.0 <2]")
     
     def build_requirements(self):
-        self.tool_requires("cmake/[>=4.0]")
+        self.tool_requires("cmake/[>=3.15 <4]")
     
     def layout(self):
         cmake_layout(self)

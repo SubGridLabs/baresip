@@ -227,11 +227,14 @@ jobs:
         conan list "*ffmpeg*" --remote=artifactory || echo "No ffmpeg packages in artifactory"
         conan list "*ffmpeg*" --remote=conancenter || echo "No ffmpeg packages in conancenter"
         
-        echo "=== Attempting to build with dependency resolution ==="
-        # Try to build with existing packages first, with verbose output
-        if ! conan create . --profile:build=ci --profile:host=ci ${OPTIONS} --build=missing -v; then
-          echo "⚠️ Build failed, likely due to missing libre/4.0.0"
-          echo "🔧 Attempting to build libre from source as fallback..."
+        echo "=== Checking for libre availability ==="
+        conan list "*libre*" --remote=artifactory || echo "No libre packages in artifactory"
+        conan list "*libre*" --remote=conancenter || echo "No libre packages in conancenter"
+        conan list "*libre*" || echo "No libre packages in local cache"
+        
+        echo "=== Checking if libre needs to be built ==="
+        if ! conan list libre/4.0.0:* --remote=artifactory >/dev/null 2>&1 && ! conan list libre/4.0.0:* >/dev/null 2>&1; then
+          echo "🔧 libre/4.0.0 not found, building from source..."
           
           # Build libre from source
           cd /tmp
@@ -284,10 +287,24 @@ jobs:
           # Build libre
           conan create . --profile:build=ci --profile:host=ci
           
-          # Go back and try building baresip again
+          # Upload to artifactory if possible
+          if conan list libre/4.0.0:* >/dev/null 2>&1; then
+            echo "Uploading libre to artifactory..."
+            PKG_REF=$(conan list libre/4.0.0:* --format=compact | grep libre | head -1 | tr -d ' ')
+            if [ ! -z "$PKG_REF" ]; then
+              conan upload "$PKG_REF" --remote=artifactory --confirm
+            fi
+          fi
+          
+          # Go back to workspace
           cd ${{ github.workspace }}
-          conan create . --profile:build=ci --profile:host=ci ${{ matrix.options }} --build=missing
+        else
+          echo "✅ libre/4.0.0 is available"
         fi
+        
+        echo "=== Attempting to build with dependency resolution ==="
+        # Build with dependency resolution
+        conan create . --profile:build=ci --profile:host=ci ${OPTIONS} --build=missing -vvv
         
     - name: Test package functionality
       run: |

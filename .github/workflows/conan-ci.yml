@@ -134,7 +134,15 @@ jobs:
           echo "✅ Built packages will be uploaded to Artifactory"
 
       - name: Authenticate with Artifactory
+        env:
+          CONAN_USER_ARTIFACTORY: ${{ secrets.CONAN_USER }}
+          CONAN_PASSWORD_ARTIFACTORY: ${{ secrets.CONAN_PASSWORD }}
         run: |
+          # Set environment variables for persistent authentication
+          echo "CONAN_USER_ARTIFACTORY=${{ secrets.CONAN_USER }}" >> $GITHUB_ENV
+          echo "CONAN_PASSWORD_ARTIFACTORY=${{ secrets.CONAN_PASSWORD }}" >> $GITHUB_ENV
+          
+          # Login with explicit credentials
           conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
           
           # Verify authentication worked by testing a simple command
@@ -152,8 +160,15 @@ jobs:
 
       - name: Build dependencies and upload missing packages (Unix)
         if: runner.os != 'Windows'
+        env:
+          CONAN_USER_ARTIFACTORY: ${{ secrets.CONAN_USER }}
+          CONAN_PASSWORD_ARTIFACTORY: ${{ secrets.CONAN_PASSWORD }}
         run: |
           echo "Building baresip dependencies and uploading missing packages..."
+          
+          # Re-authenticate to ensure fresh token before build operations
+          echo "=== Re-authenticating with Artifactory before build ==="
+          conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
           
           # Check if libre is available, if not build it from source
           echo "=== Checking libre availability ==="
@@ -202,8 +217,15 @@ jobs:
 
       - name: Build dependencies and upload missing packages (Windows)
         if: runner.os == 'Windows'
+        env:
+          CONAN_USER_ARTIFACTORY: ${{ secrets.CONAN_USER }}
+          CONAN_PASSWORD_ARTIFACTORY: ${{ secrets.CONAN_PASSWORD }}
         run: |
           echo "Building baresip dependencies and uploading missing packages..."
+          
+          # Re-authenticate to ensure fresh token before build operations
+          echo "=== Re-authenticating with Artifactory before build ==="
+          conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
           
           # Check if libre is available, if not build it from source
           echo "=== Checking libre availability ==="
@@ -255,8 +277,16 @@ jobs:
           }
 
       - name: Test default multimedia configuration
+        env:
+          CONAN_USER_ARTIFACTORY: ${{ secrets.CONAN_USER }}
+          CONAN_PASSWORD_ARTIFACTORY: ${{ secrets.CONAN_PASSWORD }}
         run: |
           echo "Testing baresip with default multimedia configuration..."
+          
+          # Re-authenticate to ensure fresh token before test build
+          echo "=== Re-authenticating with Artifactory before test ==="
+          conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
+          
           conan create . --profile:build=ci --profile:host=ci --build=missing
 
           # Upload the baresip package

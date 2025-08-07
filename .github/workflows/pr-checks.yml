@@ -405,6 +405,8 @@ jobs:
         
         cat > test.c << 'EOF'
         #include <stdio.h>
+        #include <stdint.h>
+        #include <stdbool.h>
         #include "baresip.h"
         
         int main() {

@@ -7,6 +7,9 @@
 #ifndef BARESIP_H__
 #define BARESIP_H__
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

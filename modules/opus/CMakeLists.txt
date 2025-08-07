@@ -7,7 +7,7 @@ endif()
 
 # Use Conan's Opus package when available
 if(BARESIP_USE_CONAN)
-    find_package(opus QUIET)
+    find_package(opus REQUIRED)
 endif()
 
 if(NOT TARGET Opus::opus)

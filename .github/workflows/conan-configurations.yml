@@ -238,7 +238,15 @@ jobs:
           -o with_sdl=False \
           --build=missing
           
-        MINIMAL_PKG=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1)
+        # Get minimal package reference with enhanced detection
+        MINIMAL_PKG=$(conan list baresip/4.0.0:* --format=compact | grep -v "Local Cache" | grep "baresip/4.0.0" | head -1 | tr -d ' ')
+        if [ -z "$MINIMAL_PKG" ] || [[ "$MINIMAL_PKG" == "baresip/4.0.0" ]]; then
+          PKG_ID=$(conan list baresip/4.0.0:* | grep -A 10 "packages" | grep -E "^[[:space:]]*[a-f0-9]+" | head -1 | tr -d ' ')
+          if [ ! -z "$PKG_ID" ]; then
+            MINIMAL_PKG="baresip/4.0.0:$PKG_ID"
+          fi
+        fi
+        echo "Minimal package reference: '$MINIMAL_PKG'"
         MINIMAL_PATH=$(conan cache path "$MINIMAL_PKG")
         MINIMAL_SIZE=$(du -sh "$MINIMAL_PATH" | cut -f1)
         
@@ -251,7 +259,15 @@ jobs:
           -o with_sdl=True \
           --build=missing
           
-        FULL_PKG=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | tail -1)
+        # Get full package reference with enhanced detection  
+        FULL_PKG=$(conan list baresip/4.0.0:* --format=compact | grep -v "Local Cache" | grep "baresip/4.0.0" | tail -1 | tr -d ' ')
+        if [ -z "$FULL_PKG" ] || [[ "$FULL_PKG" == "baresip/4.0.0" ]]; then
+          PKG_ID=$(conan list baresip/4.0.0:* | grep -A 10 "packages" | grep -E "^[[:space:]]*[a-f0-9]+" | tail -1 | tr -d ' ')
+          if [ ! -z "$PKG_ID" ]; then
+            FULL_PKG="baresip/4.0.0:$PKG_ID"
+          fi
+        fi
+        echo "Full package reference: '$FULL_PKG'"
         FULL_PATH=$(conan cache path "$FULL_PKG")
         FULL_SIZE=$(du -sh "$FULL_PATH" | cut -f1)
         

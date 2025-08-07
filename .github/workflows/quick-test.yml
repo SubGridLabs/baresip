@@ -64,13 +64,31 @@ jobs:
         # Quick verification that package was created successfully
         conan list baresip/4.0.0:*
         
-        # Check if executable exists in package
-        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep "baresip/4.0.0:" | head -1)
-        PKG_PATH=$(conan cache path "$PKG_REF")
-        if [[ -f "$PKG_PATH/bin/baresip" ]]; then
-          echo "✅ baresip executable found in package"
+        # Check if executable exists in package with enhanced detection
+        PKG_REF=$(conan list baresip/4.0.0:* --format=compact | grep -v "Local Cache" | grep "baresip/4.0.0" | head -1 | tr -d ' ')
+        if [ -z "$PKG_REF" ] || [[ "$PKG_REF" == "baresip/4.0.0" ]]; then
+          echo "Need to get full package reference with package ID..."
+          PKG_ID=$(conan list baresip/4.0.0:* | grep -A 10 "packages" | grep -E "^[[:space:]]*[a-f0-9]+" | head -1 | tr -d ' ')
+          if [ ! -z "$PKG_ID" ]; then
+            PKG_REF="baresip/4.0.0:$PKG_ID"
+            echo "Constructed full package reference: $PKG_REF"
+          fi
+        fi
+        echo "Found package reference: '$PKG_REF'"
+        
+        if [ ! -z "$PKG_REF" ] && [[ "$PKG_REF" == *"baresip/4.0.0"* ]]; then
+          PKG_PATH=$(conan cache path "$PKG_REF")
+          echo "Package path: $PKG_PATH"
+          if [[ -f "$PKG_PATH/bin/baresip" ]]; then
+            echo "✅ baresip executable found in package"
+          else
+            echo "❌ baresip executable not found"
+            ls -la "$PKG_PATH/bin/" || echo "bin directory not found"
+            exit 1
+          fi
         else
-          echo "❌ baresip executable not found"
-          ls -la "$PKG_PATH/bin/" || echo "bin directory not found"
+          echo "❌ No valid package reference found"
+          echo "Available packages:"
+          conan list baresip/*
           exit 1
         fi

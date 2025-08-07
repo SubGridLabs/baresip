@@ -127,6 +127,24 @@ jobs:
         EOF
         fi
         
+    - name: Setup Conan remotes
+      run: |
+        # Add artifactory first so it has higher priority
+        conan remote add artifactory ${{ secrets.CONAN_REMOTE_URL }} --force
+        conan remote add conancenter https://center2.conan.io --force
+        
+        # Verify remotes are configured correctly
+        echo "=== Configured remotes ==="
+        conan remote list
+
+    - name: Authenticate with Artifactory
+      run: |
+        conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
+        
+        # Verify authentication worked by testing a simple command
+        echo "=== Testing artifactory connection after authentication ==="
+        conan list "*" --remote=artifactory | head -5 || echo "Failed to list packages from artifactory"
+        
     - name: Install system dependencies (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |

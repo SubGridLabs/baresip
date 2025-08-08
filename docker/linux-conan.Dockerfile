@@ -13,6 +13,8 @@ RUN apt-get update -y && \
         python3 \
         python3-venv \
         pipx \
+        zstd \
+        libzstd-dev \
         ca-certificates \
         curl && \
     rm -rf /var/lib/apt/lists/*

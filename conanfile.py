@@ -153,8 +153,8 @@ class BaresipConan(ConanFile):
         self.requires("libre/4.0.0", transitive_headers=True)
 
         # Version overrides to resolve conflicts
-        # Use zstd version aligned with CI
-        self.requires("zstd/1.5.7", override=True)
+        # Prefer system zstd in our Docker/CI path; do not force a Conan zstd
+        # If a transitive needs zstd, let it resolve its own preferred version
         self.requires("opus/1.4")  # Version compatible with FFmpeg
         if self.options.with_ffmpeg and self.options.with_vpx:
             # Use version compatible with FFmpeg 6.1.1

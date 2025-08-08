@@ -321,7 +321,7 @@ if(MODULE_LINK_LIBRARIES)
     find_package(ffmpeg QUIET)
   endif()
   if("Opus::opus" IN_LIST MODULE_LINK_LIBRARIES AND BARESIP_USE_CONAN)
-    find_package(opus QUIET)
+    find_package(Opus QUIET)  # Conan uses capitalized package names
   endif()
   if("libvpx::libvpx" IN_LIST MODULE_LINK_LIBRARIES AND BARESIP_USE_CONAN)
     find_package(libvpx QUIET)

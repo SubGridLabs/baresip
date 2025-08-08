@@ -52,10 +52,18 @@ jobs:
       - name: Configure Conan (Unix)
         if: runner.os != 'Windows'
         run: |
+          echo "=== Conan Profile Configuration Debug ==="
+          echo "Matrix profile: ${{ matrix.profile }}"
+          echo "Matrix OS: ${{ matrix.os }}"
+          echo "Matrix arch: ${{ matrix.arch }}"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "RUNNER_OS env: $RUNNER_OS"
+          
           conan profile detect --force
           mkdir -p ~/.conan2/profiles
 
           if [[ "${{ matrix.profile }}" == "macos-"* ]]; then
+            echo "✅ Creating macOS profile for ${{ matrix.profile }}"
             cat > ~/.conan2/profiles/ci << 'EOF'
           [settings]
           os=Macos
@@ -69,6 +77,7 @@ jobs:
           CXX=clang++
           EOF
           elif [[ "${{ matrix.profile }}" == "linux-"* ]]; then
+            echo "✅ Creating Linux profile for ${{ matrix.profile }}"
             cat > ~/.conan2/profiles/ci << 'EOF'
           [settings]
           os=Linux
@@ -78,7 +87,15 @@ jobs:
           compiler.libcxx=libstdc++11
           build_type=${{ matrix.build_type }}
           EOF
+          else
+            echo "❌ Unknown profile: ${{ matrix.profile }}"
+            echo "Available profiles should match: macos-* or linux-*"
+            exit 1
           fi
+          
+          echo "=== Generated profile contents ==="
+          cat ~/.conan2/profiles/ci
+          echo "=== End profile debug ==="
 
       - name: Configure Conan (Windows)
         if: runner.os == 'Windows'

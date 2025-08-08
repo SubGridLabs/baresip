@@ -9,6 +9,7 @@ RUN apt-get update -y && \
         cmake \
         ninja-build \
         pkg-config \
+        libasound2-dev \
         git \
         python3 \
         python3-venv \

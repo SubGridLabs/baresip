@@ -153,6 +153,8 @@ class BaresipConan(ConanFile):
         self.requires("libre/4.0.0", transitive_headers=True)
 
         # Version overrides to resolve conflicts
+        # Pin zstd to a known-good version to avoid source layout issues in 1.5.7
+        self.requires("zstd/1.5.5", override=True)
         self.requires("opus/1.4")  # Version compatible with FFmpeg
         if self.options.with_ffmpeg and self.options.with_vpx:
             # Use version compatible with FFmpeg 6.1.1

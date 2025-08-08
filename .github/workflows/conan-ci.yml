@@ -176,6 +176,38 @@ jobs:
             conan-baresip-${{ matrix.profile }}-
             conan-baresip-
 
+      - name: Ensure Conan profile matches matrix (after cache restore)
+        if: runner.os != 'Windows'
+        run: |
+          # Re-create the 'ci' profile to avoid stale profiles from cache
+          mkdir -p ~/.conan2/profiles
+          if [[ "${{ matrix.profile }}" == "macos-"* ]]; then
+            cat > ~/.conan2/profiles/ci << 'EOF'
+          [settings]
+          os=Macos
+          arch=${{ matrix.arch }}
+          compiler=apple-clang
+          compiler.version=15
+          compiler.libcxx=libc++
+          build_type=${{ matrix.build_type }}
+          [buildenv]
+          CC=clang
+          CXX=clang++
+          EOF
+          elif [[ "${{ matrix.profile }}" == "linux-"* ]]; then
+            cat > ~/.conan2/profiles/ci << 'EOF'
+          [settings]
+          os=Linux
+          arch=${{ matrix.arch }}
+          compiler=gcc
+          compiler.version=11
+          compiler.libcxx=libstdc++11
+          build_type=${{ matrix.build_type }}
+          EOF
+          fi
+          echo "=== Active CI profile ==="
+          cat ~/.conan2/profiles/ci
+
       - name: Build dependencies and upload missing packages (Unix)
         if: runner.os != 'Windows'
         env:

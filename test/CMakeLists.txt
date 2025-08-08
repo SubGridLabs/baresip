@@ -54,9 +54,10 @@ endif()
 
 # Since baresip now links RE/REM PUBLIC, it's enough to link against baresip.
 # Keep optional REM explicit if available to ensure symbol resolution order.
+# Link order: baresip, RE, optional REM (some linkers drop indirect deps)
 if(_REM_TARGET)
   message(STATUS "Selftest linking with REM target: ${_REM_TARGET}")
-  target_link_libraries(${PROJECT_NAME} PRIVATE baresip ${_REM_TARGET})
+  target_link_libraries(${PROJECT_NAME} PRIVATE baresip ${RE_LIBRARIES} ${_REM_TARGET})
 else()
-  target_link_libraries(${PROJECT_NAME} PRIVATE baresip)
+  target_link_libraries(${PROJECT_NAME} PRIVATE baresip ${RE_LIBRARIES})
 endif()

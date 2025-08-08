@@ -135,24 +135,30 @@ if(NOT DEFINED BARESIP_BUILD_TESTS)
   endif()
 endif()
 
-# Try to find RE via Conan first, then fallback to manual
+# Try to find RE via Conan first (CMakeDeps), then fallback to local config
 if(BARESIP_USE_CONAN)
-    find_package(libre QUIET)
-    if(libre_FOUND)
-        message(STATUS "Found RE via Conan")
+    # Prefer the CMake package name used by the library itself
+    find_package(re CONFIG QUIET)
+    if(re_FOUND)
+        message(STATUS "Found RE via Conan as re::re")
         set(RE_FOUND TRUE)
-        set(RE_LIBRARIES libre::libre)
-        # For Conan targets, extract the actual path from generator expression
-        get_target_property(RE_INCLUDE_DIRS_RAW libre::libre INTERFACE_INCLUDE_DIRECTORIES)
-        message(STATUS "DEBUG: Raw include dirs = ${RE_INCLUDE_DIRS_RAW}")
-        
-        # Extract actual path from generator expression like $<$<CONFIG:Debug>:/path>
+        set(RE_LIBRARIES re::re)
+        get_target_property(RE_INCLUDE_DIRS_RAW re::re INTERFACE_INCLUDE_DIRECTORIES)
         string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
-        # Conan puts headers in include/re/, so we use the base include directory
         set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}")
-        message(STATUS "DEBUG: Processed RE_INCLUDE_DIRS = ${RE_INCLUDE_DIRS}")
     else()
-        find_package(re CONFIG REQUIRED HINTS ../re/cmake)
+        # Some recipes expose libre::libre with cmake_file_name=libre
+        find_package(libre CONFIG QUIET)
+        if(libre_FOUND)
+            message(STATUS "Found RE via Conan as libre::libre")
+            set(RE_FOUND TRUE)
+            set(RE_LIBRARIES libre::libre)
+            get_target_property(RE_INCLUDE_DIRS_RAW libre::libre INTERFACE_INCLUDE_DIRECTORIES)
+            string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
+            set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}")
+        else()
+            message(FATAL_ERROR "libre (RE) not found via Conan CMakeDeps. Ensure CMake is using conan_toolchain.cmake and CMakeDeps is generated.")
+        endif()
     endif()
 else()
     find_package(re CONFIG REQUIRED HINTS ../re/cmake)

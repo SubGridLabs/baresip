@@ -372,7 +372,9 @@ if(STATIC)
   target_include_directories(baresip PUBLIC include)
 else()
   add_library(baresip SHARED ${SRCS} ${HEADERS})
-  target_link_libraries(baresip PRIVATE ${LINKLIBS})
+  # Link RE (and optional REM) PUBLIC so consumers (e.g., selftest) get the
+  # transitive link flags and correct order automatically
+  target_link_libraries(baresip PUBLIC ${LINKLIBS})
   set_target_properties(baresip PROPERTIES VERSION
     ${PROJECT_SOVERSION}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
   set_target_properties(baresip PROPERTIES SOVERSION ${PROJECT_SOVERSION})

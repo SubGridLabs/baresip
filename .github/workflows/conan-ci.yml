@@ -174,11 +174,20 @@ jobs:
           key: conan-baresip-${{ matrix.profile }}-${{ hashFiles('conanfile.py') }}
           restore-keys: |
             conan-baresip-${{ matrix.profile }}-
-            conan-baresip-
 
       - name: Ensure Conan profile matches matrix (after cache restore)
         if: runner.os != 'Windows'
         run: |
+          echo "=== Validating cache matches runner ==="
+          uname -a || true
+          python3 -c 'import platform,sys;print(platform.platform())' || true
+          # If the cache contains paths from another OS (e.g. macOS paths) wipe it to avoid poisoning the job
+          if grep -R "^/Users/" -n ~/.conan2 2>/dev/null | head -n1; then
+            echo "⚠️  Detected macOS paths in Conan cache on Linux. Clearing cache directory to prevent contamination."
+            rm -rf ~/.conan2/*
+            mkdir -p ~/.conan2/profiles
+          fi
+
           # Re-create the 'ci' profile to avoid stale profiles from cache
           mkdir -p ~/.conan2/profiles
           if [[ "${{ matrix.profile }}" == "macos-"* ]]; then

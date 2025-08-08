@@ -1,3 +1,4 @@
+---
 name: Baresip Conan CI
 
 on:
@@ -52,63 +53,15 @@ jobs:
       - name: Configure Conan (Unix)
         if: runner.os != 'Windows'
         run: |
-          echo "=== Conan Profile Configuration Debug ==="
-          echo "Matrix profile: ${{ matrix.profile }}"
-          echo "Matrix OS: ${{ matrix.os }}"
-          echo "Matrix arch: ${{ matrix.arch }}"
-          echo "Runner OS: ${{ runner.os }}"
-          echo "RUNNER_OS env: $RUNNER_OS"
-          
+          echo "=== Conan Profile: detect (default) ==="
           conan profile detect --force
-          mkdir -p ~/.conan2/profiles
-
-          if [[ "${{ matrix.profile }}" == "macos-"* ]]; then
-            echo "✅ Creating macOS profile for ${{ matrix.profile }}"
-            cat > ~/.conan2/profiles/ci << 'EOF'
-          [settings]
-          os=Macos
-          arch=${{ matrix.arch }}
-          compiler=apple-clang
-          compiler.version=15
-          compiler.libcxx=libc++
-          build_type=${{ matrix.build_type }}
-          [buildenv]
-          CC=clang
-          CXX=clang++
-          EOF
-          elif [[ "${{ matrix.profile }}" == "linux-"* ]]; then
-            echo "✅ Creating Linux profile for ${{ matrix.profile }}"
-            cat > ~/.conan2/profiles/ci << 'EOF'
-          [settings]
-          os=Linux
-          arch=${{ matrix.arch }}
-          compiler=gcc
-          compiler.version=11
-          compiler.libcxx=libstdc++11
-          build_type=${{ matrix.build_type }}
-          EOF
-          else
-            echo "❌ Unknown profile: ${{ matrix.profile }}"
-            echo "Available profiles should match: macos-* or linux-*"
-            exit 1
-          fi
-          
-          echo "=== Generated profile contents ==="
-          cat ~/.conan2/profiles/ci
-          echo "=== End profile debug ==="
+          conan profile list || true
 
       - name: Configure Conan (Windows)
         if: runner.os == 'Windows'
         run: |
           conan profile detect --force
-          New-Item -ItemType Directory -Force -Path ~/.conan2/profiles
-          echo "[settings]" > ~/.conan2/profiles/ci
-          echo "os=Windows" >> ~/.conan2/profiles/ci
-          echo "arch=${{ matrix.arch }}" >> ~/.conan2/profiles/ci
-          echo "compiler=msvc" >> ~/.conan2/profiles/ci
-          echo "compiler.version=193" >> ~/.conan2/profiles/ci
-          echo "compiler.runtime=dynamic" >> ~/.conan2/profiles/ci
-          echo "build_type=${{ matrix.build_type }}" >> ~/.conan2/profiles/ci
+          conan profile list
 
       - name: Install system dependencies (Linux)
         if: startsWith(matrix.profile, 'linux-')
@@ -176,7 +129,7 @@ jobs:
           restore-keys: |
             conan-baresip-${{ matrix.profile }}-
 
-      - name: Ensure Conan profile matches matrix (after cache restore)
+      - name: Validate Conan cache (after restore)
         if: runner.os != 'Windows'
         run: |
           echo "=== Validating cache matches runner ==="
@@ -186,37 +139,10 @@ jobs:
           if grep -R "^/Users/" -n ~/.conan2 2>/dev/null | head -n1; then
             echo "⚠️  Detected macOS paths in Conan cache on Linux. Clearing cache directory to prevent contamination."
             rm -rf ~/.conan2/*
-            mkdir -p ~/.conan2/profiles
           fi
-
-          # Re-create the 'ci' profile to avoid stale profiles from cache
-          mkdir -p ~/.conan2/profiles
-          if [[ "${{ matrix.profile }}" == "macos-"* ]]; then
-            cat > ~/.conan2/profiles/ci << 'EOF'
-          [settings]
-          os=Macos
-          arch=${{ matrix.arch }}
-          compiler=apple-clang
-          compiler.version=15
-          compiler.libcxx=libc++
-          build_type=${{ matrix.build_type }}
-          [buildenv]
-          CC=clang
-          CXX=clang++
-          EOF
-          elif [[ "${{ matrix.profile }}" == "linux-"* ]]; then
-            cat > ~/.conan2/profiles/ci << 'EOF'
-          [settings]
-          os=Linux
-          arch=${{ matrix.arch }}
-          compiler=gcc
-          compiler.version=11
-          compiler.libcxx=libstdc++11
-          build_type=${{ matrix.build_type }}
-          EOF
-          fi
-          echo "=== Active CI profile ==="
-          cat ~/.conan2/profiles/ci
+          # Use detected default profile
+          conan profile detect --force
+          conan profile show default || true
 
       - name: Ensure Conan remotes after cache/profile (Unix)
         if: runner.os != 'Windows'
@@ -269,7 +195,9 @@ jobs:
           # Install dependencies with comprehensive multimedia options
           # This will check artifactory FIRST, then conan-center for recipes, build missing, upload to artifactory
           echo "=== Installing dependencies (artifactory first, then build missing) ==="
-          conan install . --profile:build=ci --profile:host=ci --build=missing \
+          # Force GCC toolchain for the build to match profile (avoid clang/gcc mismatch)
+          export CC=gcc CXX=g++
+          conan install . -pr:b default -pr:h default --build=missing \
             -c tools.system.package_manager:mode=install \
             -o baresip/*:with_opus=True \
             -o baresip/*:with_g722=True \
@@ -375,7 +303,7 @@ jobs:
           echo "=== Re-authenticating with Artifactory before test ==="
           conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
           
-          conan create . --profile:build=ci --profile:host=ci --build=missing \
+          conan create . -pr:b default -pr:h default --build=missing \
             -c tools.system.package_manager:mode=install
 
           # Upload the baresip package
@@ -389,7 +317,7 @@ jobs:
         if: matrix.profile != 'windows-x64'
         run: |
           echo "Testing baresip minimal configuration..."
-          conan create . --profile:build=ci --profile:host=ci \
+          conan create . -pr:b default -pr:h default \
             -c tools.system.package_manager:mode=install \
             -o baresip/*:with_opus=False \
             -o baresip/*:with_av1=False \
@@ -407,7 +335,7 @@ jobs:
         if: matrix.profile == 'linux-x64'
         run: |
           echo "Testing baresip with professional audio configuration..."
-          conan create . --profile:build=ci --profile:host=ci \
+          conan create . -pr:b default -pr:h default \
             -c tools.system.package_manager:mode=install \
             -o baresip/*:with_opus=True \
             -o baresip/*:with_g722=True \

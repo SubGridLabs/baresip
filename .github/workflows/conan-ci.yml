@@ -119,6 +119,7 @@ jobs:
             libc++-dev libc++abi-dev \
             libasound2-dev libjack-dev \
             libgtk-3-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            libegl1-mesa-dev \
             portaudio19-dev
 
       - name: Install system dependencies (macOS)
@@ -269,6 +270,7 @@ jobs:
           # This will check artifactory FIRST, then conan-center for recipes, build missing, upload to artifactory
           echo "=== Installing dependencies (artifactory first, then build missing) ==="
           conan install . --profile:build=ci --profile:host=ci --build=missing \
+            -c tools.system.package_manager:mode=install \
             -o baresip/*:with_opus=True \
             -o baresip/*:with_g722=True \
             -o baresip/*:with_g711=True \
@@ -373,7 +375,8 @@ jobs:
           echo "=== Re-authenticating with Artifactory before test ==="
           conan remote login artifactory ${{ secrets.CONAN_USER }} -p ${{ secrets.CONAN_PASSWORD }}
           
-          conan create . --profile:build=ci --profile:host=ci --build=missing
+          conan create . --profile:build=ci --profile:host=ci --build=missing \
+            -c tools.system.package_manager:mode=install
 
           # Upload the baresip package
           conan upload "baresip/*" -r artifactory -c
@@ -387,6 +390,7 @@ jobs:
         run: |
           echo "Testing baresip minimal configuration..."
           conan create . --profile:build=ci --profile:host=ci \
+            -c tools.system.package_manager:mode=install \
             -o baresip/*:with_opus=False \
             -o baresip/*:with_av1=False \
             -o baresip/*:with_gstreamer=False \
@@ -404,6 +408,7 @@ jobs:
         run: |
           echo "Testing baresip with professional audio configuration..."
           conan create . --profile:build=ci --profile:host=ci \
+            -c tools.system.package_manager:mode=install \
             -o baresip/*:with_opus=True \
             -o baresip/*:with_g722=True \
             -o baresip/*:with_alsa=True \
@@ -422,6 +427,7 @@ jobs:
         run: |
           echo "Testing baresip with video-focused configuration..."
           conan create . --profile:build=ci --profile:host=ci \
+            -c tools.system.package_manager:mode=install \
             -o baresip/*:with_av1=True \
             -o baresip/*:with_sdl=True \
             -o baresip/*:with_gstreamer=True \

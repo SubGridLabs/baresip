@@ -319,6 +319,19 @@ endif()
 
 set(LINKLIBS ${RE_LIBRARIES} ${RE_LIBS})
 
+# If the RE package also provides a REM (media) target, link it as well.
+# This resolves undefined symbols such as aubuf_*, rtp_*, sdp_*, etc. in shared builds.
+set(REM_LIBRARIES "")
+if(TARGET rem::rem)
+  set(REM_LIBRARIES rem::rem)
+elseif(TARGET librem::librem)
+  set(REM_LIBRARIES librem::librem)
+endif()
+if(REM_LIBRARIES)
+  list(APPEND LINKLIBS ${REM_LIBRARIES})
+  message(STATUS "Linking REM via target: ${REM_LIBRARIES}")
+endif()
+
 if(WIN32)
   list(APPEND LINKLIBS winmm gdi32 crypt32 strmiids ole32 oleaut32)
 endif()

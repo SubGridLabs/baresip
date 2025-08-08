@@ -46,4 +46,15 @@ add_executable(${PROJECT_NAME}
   main.c
 )
 
-target_link_libraries(${PROJECT_NAME} baresip ${REM_LIBRARIES} ${RE_LIBRARIES})
+if(TARGET rem::rem)
+  set(_REM_TARGET rem::rem)
+elseif(TARGET librem::librem)
+  set(_REM_TARGET librem::librem)
+endif()
+
+if(_REM_TARGET)
+  message(STATUS "Selftest linking with REM target: ${_REM_TARGET}")
+  target_link_libraries(${PROJECT_NAME} baresip ${_REM_TARGET} ${RE_LIBRARIES})
+else()
+  target_link_libraries(${PROJECT_NAME} baresip ${RE_LIBRARIES})
+endif()

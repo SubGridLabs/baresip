@@ -249,8 +249,9 @@ class BaresipConan(ConanFile):
         tc.variables["CONAN_PNG_ENABLED"] = self.options.with_png
         tc.variables["CONAN_SNDFILE_ENABLED"] = self.options.with_sndfile
         tc.variables["CONAN_VPX_ENABLED"] = self.options.with_vpx
-        # Disable selftests in Conan builds to avoid linking issues against system libre
-        tc.variables["BARESIP_BUILD_TESTS"] = False
+        # Re-enable tests for Conan CI; we want to run unit tests in a separate stage
+        # CI workflows can still override via -DBARESIP_BUILD_TESTS=OFF if needed
+        tc.variables["BARESIP_BUILD_TESTS"] = True
 
         # Note: Keep STATIC=False to avoid complex static linking issues
         # Modules will be .so files but still work properly

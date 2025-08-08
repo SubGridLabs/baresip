@@ -125,6 +125,16 @@ endif()
 
 
 
+# Control building of selftests
+# Default: ON for traditional builds, OFF when using Conan
+if(NOT DEFINED BARESIP_BUILD_TESTS)
+  if(BARESIP_USE_CONAN)
+    set(BARESIP_BUILD_TESTS OFF)
+  else()
+    set(BARESIP_BUILD_TESTS ON)
+  endif()
+endif()
+
 # Try to find RE via Conan first, then fallback to manual
 if(BARESIP_USE_CONAN)
     find_package(libre QUIET)
@@ -388,7 +398,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libbaresip.pc
 #
 
 add_subdirectory(webrtc)
-add_subdirectory(test)
+if(BARESIP_BUILD_TESTS)
+  add_subdirectory(test)
+endif()
 
 
 ##############################################################################

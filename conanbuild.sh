@@ -1,1 +1,0 @@
-. "/Users/palmarti/development/baresip/conanbuildenv-release-armv8.sh"

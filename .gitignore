@@ -1,3 +1,9 @@
+# Conan local env activation scripts (never commit)
+conanbuild.sh
+conanrun.sh
+conanbuildenv-*.sh
+conanrunenv-*.sh
+
 # Object files
 *.o
 *.ko

@@ -151,7 +151,6 @@ class BaresipConan(ConanFile):
     def requirements(self):
         # Core dependencies
         self.requires("libre/4.0.0", transitive_headers=True)
-        self.requires("librem/4.0.0", transitive_headers=True)
 
         # Version overrides to resolve conflicts
         self.requires("opus/1.4")  # Version compatible with FFmpeg
@@ -250,8 +249,6 @@ class BaresipConan(ConanFile):
         tc.variables["CONAN_PNG_ENABLED"] = self.options.with_png
         tc.variables["CONAN_SNDFILE_ENABLED"] = self.options.with_sndfile
         tc.variables["CONAN_VPX_ENABLED"] = self.options.with_vpx
-        # Mark that REM should be used from Conan
-        tc.variables["CONAN_REM_ENABLED"] = True
 
         # Note: Keep STATIC=False to avoid complex static linking issues
         # Modules will be .so files but still work properly

@@ -217,6 +217,21 @@ jobs:
           echo "=== Active CI profile ==="
           cat ~/.conan2/profiles/ci
 
+      - name: Ensure Conan remotes after cache/profile (Unix)
+        if: runner.os != 'Windows'
+        env:
+          CONAN_REMOTE_URL: ${{ secrets.CONAN_REMOTE_URL }}
+          CONAN_USER: ${{ secrets.CONAN_USER }}
+          CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
+        run: |
+          # Re-add and enable artifactory remote in case cache wipe removed remotes
+          conan remote add artifactory "$CONAN_REMOTE_URL" --force
+          conan remote add conancenter https://center2.conan.io --force
+          conan remote enable artifactory || true
+          conan remote login artifactory "$CONAN_USER" -p "$CONAN_PASSWORD"
+          echo "=== Remotes after ensure-step ==="
+          conan remote list
+
       - name: Build dependencies and upload missing packages (Unix)
         if: runner.os != 'Windows'
         env:

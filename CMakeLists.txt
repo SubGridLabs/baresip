@@ -125,8 +125,9 @@ endif()
 
 
 
-# Try to find RE via Conan first, then fallback to manual
+# Try to find RE (libre) and REM (librem) via Conan first, then fallback
 if(BARESIP_USE_CONAN)
+    # libre (RE)
     find_package(libre QUIET)
     if(libre_FOUND)
         message(STATUS "Found RE via Conan")
@@ -134,18 +135,39 @@ if(BARESIP_USE_CONAN)
         set(RE_LIBRARIES libre::libre)
         # For Conan targets, extract the actual path from generator expression
         get_target_property(RE_INCLUDE_DIRS_RAW libre::libre INTERFACE_INCLUDE_DIRECTORIES)
-        message(STATUS "DEBUG: Raw include dirs = ${RE_INCLUDE_DIRS_RAW}")
-        
-        # Extract actual path from generator expression like $<$<CONFIG:Debug>:/path>
+        message(STATUS "DEBUG: Raw RE include dirs = ${RE_INCLUDE_DIRS_RAW}")
         string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
-        # Conan puts headers in include/re/, so we use the base include directory
         set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}")
         message(STATUS "DEBUG: Processed RE_INCLUDE_DIRS = ${RE_INCLUDE_DIRS}")
     else()
         find_package(re CONFIG REQUIRED HINTS ../re/cmake)
     endif()
+
+    # librem (REM)
+    find_package(librem QUIET)
+    if(librem_FOUND)
+        message(STATUS "Found REM via Conan")
+        set(REM_FOUND TRUE)
+        set(REM_LIBRARIES librem::librem)
+        get_target_property(REM_INCLUDE_DIRS_RAW librem::librem INTERFACE_INCLUDE_DIRECTORIES)
+        message(STATUS "DEBUG: Raw REM include dirs = ${REM_INCLUDE_DIRS_RAW}")
+        string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" REM_INCLUDE_BASE "${REM_INCLUDE_DIRS_RAW}")
+        set(REM_INCLUDE_DIRS "${REM_INCLUDE_BASE}")
+        message(STATUS "DEBUG: Processed REM_INCLUDE_DIRS = ${REM_INCLUDE_DIRS}")
+    else()
+        # Try config package first, then module-based FindREM.cmake
+        find_package(rem CONFIG QUIET HINTS ../rem/cmake)
+        if(NOT rem_FOUND)
+            find_package(REM REQUIRED)
+        endif()
+    endif()
 else()
     find_package(re CONFIG REQUIRED HINTS ../re/cmake)
+    # Try config package for rem first, then module find
+    find_package(rem CONFIG QUIET HINTS ../rem/cmake)
+    if(NOT rem_FOUND)
+        find_package(REM REQUIRED)
+    endif()
 endif()
 
 list(APPEND RE_DEFINITIONS
@@ -162,6 +184,7 @@ include_directories(
   include
   src
   ${RE_INCLUDE_DIRS}
+  ${REM_INCLUDE_DIRS}
   ${OPENSSL_INCLUDE_DIR}
 )
 
@@ -307,7 +330,7 @@ endif()
 # Main target library
 #
 
-set(LINKLIBS ${RE_LIBRARIES} ${RE_LIBS})
+set(LINKLIBS ${RE_LIBRARIES} ${REM_LIBRARIES} ${RE_LIBS})
 
 if(WIN32)
   list(APPEND LINKLIBS winmm gdi32 crypt32 strmiids ole32 oleaut32)

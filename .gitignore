@@ -30,6 +30,7 @@ src/static.c
 /build*
 *.pc
 re_trace.json
+.conan_*
 
 # Backup files
 *~

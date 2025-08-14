@@ -1,0 +1,84 @@
+---
+name: Build with Diff
+
+on:
+  workflow_dispatch:
+    inputs:
+      diff_content:
+        description: 'Git diff content to apply before building'
+        required: true
+        type: string
+      build_preset:
+        description: 'Build preset (default, video, audio)'
+        required: false
+        default: 'default'
+        type: choice
+        options:
+          - default
+          - video
+          - audio
+      target_branch:
+        description: 'Base branch to apply diff to'
+        required: false
+        default: 'conan-integration'
+        type: string
+
+env:
+  CONAN_V2_MODE: 1
+
+jobs:
+  build-with-diff:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          
+      - name: Apply diff
+        run: |
+          echo "Applying provided diff..."
+          echo "${{ inputs.diff_content }}" > changes.diff
+          
+          # Show the diff that will be applied
+          echo "=== Diff to be applied ==="
+          cat changes.diff
+          echo "=========================="
+          
+          # Apply the diff
+          git apply changes.diff || {
+            echo "Failed to apply diff cleanly, trying with --ignore-whitespace"
+            git apply --ignore-whitespace changes.diff || {
+              echo "Failed to apply diff, trying with --reject"
+              git apply --reject changes.diff || {
+                echo "ERROR: Could not apply diff"
+                exit 1
+              }
+            }
+          }
+          
+          # Show what changed
+          echo "=== Changes applied ==="
+          git diff --name-only
+          git diff
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build with Docker
+        run: |
+          echo "Building with preset: ${{ inputs.build_preset }}"
+          chmod +x scripts/docker-build-linux-ci.sh
+          ./scripts/docker-build-linux-ci.sh ${{ inputs.build_preset }}
+          
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ inputs.build_preset }}
+          path: |
+            *.log
+            *.html
+            dependency_graph*.html
+          retention-days: 7

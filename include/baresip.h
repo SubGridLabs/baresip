@@ -17,7 +17,7 @@ extern "C" {
 
 
 /** Defines the Baresip version string */
-#define BARESIP_VERSION "3.24.0"
+#define BARESIP_VERSION "4.0.0"
 
 
 #ifndef NET_MAX_NS
@@ -257,6 +257,7 @@ uint32_t      call_setup_duration(const struct call *call);
 const char   *call_id(const struct call *call);
 const char   *call_peeruri(const struct call *call);
 const char   *call_peername(const struct call *call);
+const char   *call_statename(const struct call *call);
 const char   *call_localuri(const struct call *call);
 const char   *call_alerturi(const struct call *call);
 const char   *call_diverteruri(const struct call *call);

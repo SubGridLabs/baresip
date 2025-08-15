@@ -64,10 +64,12 @@ jobs:
           }
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      # OpenSSL installation removed - now handled by Conan in conan-ci.yml workflow
-      # This prevents conflicts between system OpenSSL and Conan-managed OpenSSL
+      - name: Install OpenSSL
+        if: ${{ matrix.config.openssl }}
+        run: |
+          choco install --no-progress ${{ matrix.config.choco }} openssl --version 3.5.2
 
       - uses: sreimers/pr-dependency-action@v1
         with:

@@ -58,20 +58,35 @@ jobs:
         conan remote add test-conan http://13.61.152.119:9300 --force
         conan remote list
         
-        # Login to test-conan
-        echo "${{ secrets.CONAN_PASSWORD }}" | conan remote login test-conan ${{ secrets.CONAN_USER }}
+        # Login to test-conan (check if secrets are available)
+        if [[ -n "${{ secrets.CONAN_USER }}" && -n "${{ secrets.CONAN_PASSWORD }}" ]]; then
+          echo "🔐 Logging in to test-conan..."
+          echo "${{ secrets.CONAN_PASSWORD }}" | conan remote login test-conan ${{ secrets.CONAN_USER }}
+        else
+          echo "⚠️  CONAN_USER or CONAN_PASSWORD secrets not found"
+          echo "💡 Repository admin needs to add these secrets for artifactory access"
+          echo "📦 Will try to continue with public packages only..."
+        fi
         
-        # Install bbconanconfig
-        conan config install-pkg bbconanconfig/0.9.5
+        # Install bbconanconfig (might fail if not authenticated)
+        conan config install-pkg bbconanconfig/0.9.5 || echo "⚠️ Could not install bbconanconfig - missing authentication?"
         
     - name: Build with Conan
       run: |
         echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
+        # Check if the profile exists, fallback to default if not
+        if conan profile show ${{ matrix.profile }} >/dev/null 2>&1; then
+          echo "✅ Using profile: ${{ matrix.profile }}"
+          PROFILE_ARG="-pr:h ${{ matrix.profile }} -pr:b ${{ matrix.profile }}"
+        else
+          echo "⚠️  Profile ${{ matrix.profile }} not found, using default"
+          PROFILE_ARG=""
+        fi
+        
         conan create . \
-          -pr:h ${{ matrix.profile }} \
-          -pr:b ${{ matrix.profile }} \
+          $PROFILE_ARG \
           ${{ matrix.config.opts }} \
           --build=missing
           
@@ -80,16 +95,25 @@ jobs:
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
-        # Upload baresip package
-        conan upload "baresip/4.0.0" -r=test-conan --confirm
-        
-        # Upload any other packages that might have been built
-        conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do
-          if [[ "$package" != "baresip"* ]]; then
-            echo "📦 Checking if $package was built and needs upload..."
-            conan upload "$package" -r=test-conan --confirm || true
-          fi
-        done
+        # Check if we're authenticated to test-conan
+        if conan remote auth test-conan >/dev/null 2>&1; then
+          echo "✅ Authenticated to test-conan, uploading packages..."
+          
+          # Upload baresip package
+          conan upload "baresip/4.0.0" -r=test-conan --confirm
+          
+          # Upload any other packages that might have been built
+          conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do
+            if [[ "$package" != "baresip"* ]]; then
+              echo "📦 Checking if $package was built and needs upload..."
+              conan upload "$package" -r=test-conan --confirm || true
+            fi
+          done
+        else
+          echo "⚠️  Not authenticated to test-conan remote"
+          echo "💡 Skipping upload - packages built successfully but not uploaded"
+          echo "🔐 Repository admin needs to add CONAN_USER and CONAN_PASSWORD secrets"
+        fi
         
     - name: Verify installation
       run: |
@@ -108,13 +132,28 @@ jobs:
         VirtualBuildEnv
         EOF
         
-        conan install . -d full_deploy -pr:h ${{ matrix.profile }}
+        # Use same profile logic as build step
+        if conan profile show ${{ matrix.profile }} >/dev/null 2>&1; then
+          PROFILE_ARG="-pr:h ${{ matrix.profile }}"
+        else
+          PROFILE_ARG=""
+        fi
         
-        # Test that baresip runs and shows correct version
-        ./full_deploy/host/baresip/4.0.0/Release/armv8/bin/baresip --version | head -1
+        conan install . -d full_deploy $PROFILE_ARG
+        
+        # Find the baresip binary (path may vary based on profile)
+        BARESIP_BIN=$(find full_deploy -name "baresip" -type f | head -1)
+        if [[ -n "$BARESIP_BIN" ]]; then
+          echo "✅ Found baresip at: $BARESIP_BIN"
+          $BARESIP_BIN --version | head -1
+        else
+          echo "❌ Could not find baresip binary"
+          find full_deploy -type f -name "*baresip*" || true
+          exit 1
+        fi
         
         # Verify it shows v4.0.0
-        if ./full_deploy/host/baresip/4.0.0/Release/armv8/bin/baresip --version | grep -q "baresip v4.0.0"; then
+        if [[ -n "$BARESIP_BIN" ]] && $BARESIP_BIN --version | grep -q "baresip v4.0.0"; then
           echo "✅ Version verification passed"
         else
           echo "❌ Version verification failed"

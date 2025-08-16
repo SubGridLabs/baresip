@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         profile: 
-          - bb_linux_ubuntu_24_10_x86_64_release_gcc_14
+          - bb_linux_ubuntu_24_10_x86_64_release_clang_19
         config:
           - { preset: "default", opts: "-o 'baresip/*:with_sdl=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=True' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
 
@@ -47,21 +47,18 @@ jobs:
 
     - name: Configure Conan in Docker
       run: |
-        echo "🏗️ Configuring Conan in Docker container..."
+        echo "🏗️ Configuring Conan in Docker container with internal cache..."
         
-        # Create temporary cache directory for GitHub Actions
-        mkdir -p /tmp/conan-cache
-        
-        # Configure Conan remotes and authentication in Docker
+        # Configure Conan remotes and authentication in Docker (internal cache only)
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
-          -v "/tmp/conan-cache":/workspace/.conan_cache \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
-          -e CONAN_HOME=/workspace/.conan_cache \
+          -e CONAN_HOME=/tmp/conan-home \
           baresip-linux-conan:latest \
           bash -c "
-            echo '🔧 Setting up Conan remotes...'
+            echo '🔧 Setting up Conan remotes with internal cache...'
+            mkdir -p /tmp/conan-home
             conan profile detect --force
             
             # Add test-conan remote with index 0 (highest priority)
@@ -87,32 +84,26 @@ jobs:
         echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
-        # Run build in Docker container
+        # Run build in Docker container with internal cache
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
-          -v "/tmp/conan-cache":/workspace/.conan_cache \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
-          -e CONAN_HOME=/workspace/.conan_cache \
+          -e CONAN_HOME=/tmp/conan-home \
           -e GITHUB_EVENT_NAME="${{ github.event_name }}" \
           -e GITHUB_REF_NAME="${{ github.ref_name }}" \
           -e GITHUB_REF="${{ github.ref }}" \
           baresip-linux-conan:latest \
           bash -c "
-            # Check if the profile exists, fallback to default if not
-            if conan profile show ${{ matrix.profile }} >/dev/null 2>&1; then
-              echo '✅ Using profile: ${{ matrix.profile }}'
-              PROFILE_ARG='-pr:h ${{ matrix.profile }} -pr:b ${{ matrix.profile }}'
-            else
-              echo '⚠️  Profile ${{ matrix.profile }} not found, using default'
-              PROFILE_ARG=''
-            fi
+            # Always use the specific profile (no fallback to default)
+            echo '✅ Using profile: ${{ matrix.profile }}'
             
             # The version is now dynamically generated in conanfile.py
             conan create . \
-              \$PROFILE_ARG \
+              -pr:h ${{ matrix.profile }} \
+              -pr:b ${{ matrix.profile }} \
               ${{ matrix.config.opts }} \
-              --build=baresip
+              --build=missing
           "
           
     - name: Upload packages to artifactory
@@ -120,13 +111,12 @@ jobs:
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
-        # Run upload in Docker container (same pattern as macOS but in container)
+        # Run upload in Docker container with internal cache
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
-          -v "/tmp/conan-cache":/workspace/.conan_cache \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
-          -e CONAN_HOME=/workspace/.conan_cache \
+          -e CONAN_HOME=/tmp/conan-home \
           baresip-linux-conan:latest \
           bash -c "
             # Check if we're authenticated to test-conan
@@ -155,10 +145,9 @@ jobs:
     - name: ✅ Build completed successfully  
       run: |
         echo "✅ Build and upload completed successfully!"
-        # Get version from Docker container cache
+        # Get version from Docker container internal cache
         BARESIP_VERSION=$(docker run --rm --platform linux/amd64 \
-          -v "/tmp/conan-cache":/workspace/.conan_cache \
-          -e CONAN_HOME=/workspace/.conan_cache \
+          -e CONAN_HOME=/tmp/conan-home \
           baresip-linux-conan:latest \
           bash -c "conan list 'baresip/*' --cache --format=compact | grep 'baresip/' | cut -d'/' -f2 | head -1" || echo "unknown")
         echo "📦 Built and uploaded baresip version: ${BARESIP_VERSION}"

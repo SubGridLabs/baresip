@@ -1,0 +1,122 @@
+name: Conan macOS Build
+
+on:
+  push:
+    branches: [ main, conan-integration ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Check if this is a Conan integration (skip if not)
+  check-conan:
+    runs-on: ubuntu-latest
+    outputs:
+      skip-legacy: ${{ steps.check.outputs.skip-legacy }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: check
+      run: |
+        if [[ -f "conanfile.py" ]]; then
+          echo "skip-legacy=false" >> $GITHUB_OUTPUT
+          echo "🚀 Conan integration detected"
+        else
+          echo "skip-legacy=true" >> $GITHUB_OUTPUT
+          echo "📦 No conanfile.py found, skipping Conan workflow"
+        fi
+
+  macos-build:
+    needs: check-conan
+    if: needs.check-conan.outputs.skip-legacy == 'false'
+    runs-on: macos-14
+    
+    strategy:
+      matrix:
+        profile: 
+          - bb_macos_15_5_armv8_release_apple-clang_17_0
+        config:
+          - { preset: "default", opts: "-o 'baresip/*:with_sdl=True' -o 'baresip/*:with_pipewire=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=False' -o 'baresip/*:with_ffmpeg=False' -o 'baresip/*:with_vpx=False' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Conan
+      run: |
+        python -m pip install --upgrade pip
+        pip install "conan>=2.0"
+
+    - name: Setup Conan
+      run: |
+        conan profile detect --force
+        
+        # Add test-conan remote with higher priority
+        conan remote add test-conan http://13.61.152.119:9300 --force
+        conan remote list
+        
+        # Login to test-conan
+        echo "${{ secrets.CONAN_PASSWORD }}" | conan remote login test-conan ${{ secrets.CONAN_USER }}
+        
+        # Install bbconanconfig
+        conan config install-pkg bbconanconfig/0.9.5
+        
+    - name: Build with Conan
+      run: |
+        echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
+        echo "📋 Configuration: ${{ matrix.config.preset }}"
+        
+        conan create . \
+          -pr:h ${{ matrix.profile }} \
+          -pr:b ${{ matrix.profile }} \
+          ${{ matrix.config.opts }} \
+          --build=missing
+          
+    - name: Upload packages to artifactory
+      if: success()
+      run: |
+        echo "📤 Uploading built packages to test-conan remote..."
+        
+        # Upload baresip package
+        conan upload "baresip/4.0.0" -r=test-conan --confirm
+        
+        # Upload any other packages that might have been built
+        conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do
+          if [[ "$package" != "baresip"* ]]; then
+            echo "📦 Checking if $package was built and needs upload..."
+            conan upload "$package" -r=test-conan --confirm || true
+          fi
+        done
+        
+    - name: Verify installation
+      run: |
+        echo "🧪 Testing deployment..."
+        mkdir -p test-deploy && cd test-deploy
+        
+        cat > conanfile.txt << 'EOF'
+        [requires]
+        baresip/4.0.0
+        
+        [options]
+        baresip/*:with_sdl=True
+        baresip/*:with_pipewire=True
+        
+        [generators]
+        VirtualBuildEnv
+        EOF
+        
+        conan install . -d full_deploy -pr:h ${{ matrix.profile }}
+        
+        # Test that baresip runs and shows correct version
+        ./full_deploy/host/baresip/4.0.0/Release/armv8/bin/baresip --version | head -1
+        
+        # Verify it shows v4.0.0
+        if ./full_deploy/host/baresip/4.0.0/Release/armv8/bin/baresip --version | grep -q "baresip v4.0.0"; then
+          echo "✅ Version verification passed"
+        else
+          echo "❌ Version verification failed"
+          exit 1
+        fi

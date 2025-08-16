@@ -15,8 +15,27 @@ on:
     - stable
 
 jobs:
+  # Check if this is a Conan integration (skip legacy build if so)
+  check-conan:
+    runs-on: ubuntu-latest
+    outputs:
+      skip-legacy: ${{ steps.check.outputs.skip-legacy }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: check
+      run: |
+        if [[ -f "conanfile.py" ]]; then
+          echo "skip-legacy=true" >> $GITHUB_OUTPUT
+          echo "🚀 Conan integration detected - skipping legacy Fedora build"
+        else
+          echo "skip-legacy=false" >> $GITHUB_OUTPUT
+          echo "📦 No Conan integration - running legacy Fedora build"
+        fi
+
   dependency:
     runs-on: ubuntu-latest
+    needs: check-conan
+    if: needs.check-conan.outputs.skip-legacy != 'true'
     steps:
     - uses: actions/checkout@v5
 
@@ -33,7 +52,8 @@ jobs:
         retention-days: 1
 
   build:
-    needs: dependency
+    needs: [check-conan, dependency]
+    if: needs.check-conan.outputs.skip-legacy != 'true'
     runs-on: ubuntu-latest
     container: fedora
 

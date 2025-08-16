@@ -9,8 +9,27 @@ on:
     - main
 
 jobs:
+  # Check if this is a Conan integration (skip legacy build if so)
+  check-conan:
+    runs-on: ubuntu-latest
+    outputs:
+      skip-legacy: ${{ steps.check.outputs.skip-legacy }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: check
+      run: |
+        if [[ -f "conanfile.py" ]]; then
+          echo "skip-legacy=true" >> $GITHUB_OUTPUT
+          echo "🚀 Conan integration detected - skipping legacy MinGW build"
+        else
+          echo "skip-legacy=false" >> $GITHUB_OUTPUT
+          echo "📦 No Conan integration - running legacy MinGW build"
+        fi
+
   MinGW-w64-build:
     runs-on: ubuntu-24.04
+    needs: check-conan
+    if: needs.check-conan.outputs.skip-legacy != 'true'
 
     steps:
 

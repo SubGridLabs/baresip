@@ -27,7 +27,8 @@ endif()
 if(BARESIP_USE_CONAN AND TARGET libaom-av1::libaom-av1)
     target_link_libraries(${PROJECT_NAME} PRIVATE libaom-av1::libaom-av1)
     # Add to global list for main baresip library linking
-    set_property(GLOBAL APPEND PROPERTY BARESIP_LINK_LIBRARIES libaom-av1::libaom-av1)
+    set_property(GLOBAL APPEND PROPERTY BARESIP_LINK_LIBRARIES
+            libaom-av1::libaom-av1)
 else()
     target_include_directories(${PROJECT_NAME} PRIVATE ${AOM_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${AOM_LIBRARY})

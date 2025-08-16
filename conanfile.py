@@ -2,11 +2,50 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMakeDeps, cmake_layout, CMake
 from conan.tools.files import copy, load
 import os
+import subprocess
+import re
+
+
+def get_dynamic_version():
+    """Generate dynamic version based on git context and environment"""
+    base_version = "4.0.0"
+    
+    try:
+        # Get git hash
+        git_hash = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"], 
+            stderr=subprocess.DEVNULL
+        ).decode().strip()
+        
+        # Check for GitHub environment variables
+        github_event_name = os.environ.get("GITHUB_EVENT_NAME")
+        github_ref_name = os.environ.get("GITHUB_REF_NAME") 
+        
+        # For PRs, extract number from GITHUB_REF (refs/pull/123/merge)
+        if github_event_name == "pull_request":
+            github_ref = os.environ.get("GITHUB_REF", "")
+            pr_match = re.search(r'/pull/(\d+)/', github_ref)
+            if pr_match:
+                pr_number = pr_match.group(1)
+                return f"{base_version}-pr{pr_number}-{git_hash}"
+        elif github_ref_name == "main":
+            # Main branch: 4.0.0 (stable)
+            return base_version
+        elif github_ref_name:
+            # Other branches: 4.0.0-feature-branch-abc1234
+            clean_branch = re.sub(r'[^a-zA-Z0-9.-]', '-', github_ref_name)
+            return f"{base_version}-{clean_branch}-{git_hash}"
+        else:
+            # Local development: 4.0.0-dev-abc1234
+            return f"{base_version}-dev-{git_hash}"
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        # Fallback if git is not available
+        return base_version
 
 
 class BaresipConan(ConanFile):
     name = "baresip"
-    version = "4.0.0"
+    version = get_dynamic_version()
 
     # Export all source files needed for building
     exports_sources = (
@@ -179,7 +218,7 @@ class BaresipConan(ConanFile):
 
         if self.options.with_ffmpeg:
             # Note: Also set as override above for version consistency
-            self.requires("ffmpeg/6.1.1")
+            self.requires("ffmpeg/7.1.1")
 
         # Audio systems
         if self.options.with_alsa and self.settings.os == "Linux":
@@ -226,6 +265,10 @@ class BaresipConan(ConanFile):
         if self.settings.os == "Windows":
             # Use CMake 3.27.9 for compatibility with all deps including bzip2
             self.tool_requires("cmake/3.27.9")
+        
+        # Note: gettext and libtool will automatically be resolved from test-conan first
+        # due to remote priority order (test-conan has --index 0 in docker setup)
+        # No special handling needed - Conan checks remotes in priority order
 
     def layout(self):
         cmake_layout(self)
@@ -257,6 +300,11 @@ class BaresipConan(ConanFile):
 
         # Note: Keep STATIC=False to avoid complex static linking issues
         # Modules will be .so files but still work properly
+
+        # For Conan packages, rely on RPATH-based module discovery instead of 
+        # setting MOD_PATH to avoid compiling absolute paths into the binary.
+        # The RPATH configuration in CMakeLists.txt ensures module discovery works.
+        # MOD_PATH is intentionally not set here.
 
         tc.generate()
 

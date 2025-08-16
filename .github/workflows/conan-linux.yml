@@ -86,6 +86,7 @@ jobs:
         echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
+        # The version is now dynamically generated in conanfile.py
         conan create . \
           -pr:h ${{ matrix.profile }} \
           -pr:b ${{ matrix.profile }} \
@@ -97,8 +98,10 @@ jobs:
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
-        # Upload baresip package
-        conan upload "baresip/4.0.0" -r=test-conan --confirm
+                # Upload baresip package (get version from conan cache)
+        BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
+        echo "📦 Uploading baresip version: ${BARESIP_VERSION}"
+        conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm
         
         # Upload any other packages that might have been built
         conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do

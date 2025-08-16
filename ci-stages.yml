@@ -1,0 +1,3734 @@
+[
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphoneos_18_5_armv8_debug_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphoneos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-armv8-sdk-iphoneos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphoneos_18_5_armv8_release_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphoneos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-armv8-sdk-iphoneos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphoneos_18_5_armv8_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphoneos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-armv8-sdk-iphoneos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphoneos_18_5_armv8_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphoneos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-armv8-sdk-iphoneos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphonesimulator_18_5_armv8_debug_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphonesimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-armv8-sdk-iphonesimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphonesimulator_18_5_armv8_release_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphonesimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-armv8-sdk-iphonesimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphonesimulator_18_5_armv8_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphonesimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-armv8-sdk-iphonesimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_ios_iphonesimulator_18_5_armv8_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "iOS",
+                "os.version": "18.5",
+                "arch": "armv8",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "iphonesimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-armv8-sdk-iphonesimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvos_18_5_arm64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-sdk-appletvos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvos_18_5_arm64_release_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-sdk-appletvos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvos_18_5_arm64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-sdk-appletvos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvos_18_5_arm64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvos"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-sdk-appletvos-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvsimulator_18_5_arm64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-sdk-appletvsimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvsimulator_18_5_arm64_release_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-sdk-appletvsimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvsimulator_18_5_arm64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-sdk-appletvsimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_tvos_appletvsimulator_18_5_arm64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "tvOS",
+                "os.version": "18.5",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "appletvsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-sdk-appletvsimulator-18.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xros_2_5_arm64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xros"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-sdk-xros-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xros_2_5_arm64_release_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xros"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-sdk-xros-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xros_2_5_arm64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xros"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-sdk-xros-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xros_2_5_arm64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xros"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-sdk-xros-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xrsimulator_2_5_arm64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xrsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-sdk-xrsimulator-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xrsimulator_2_5_arm64_release_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xrsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-sdk-xrsimulator-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xrsimulator_2_5_arm64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xrsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-sdk-xrsimulator-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_visionos_xrsimulator_2_5_arm64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "visionOS",
+                "os.version": "2.5",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11,
+                "os.sdk": "xrsimulator"
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-sdk-xrsimulator-2.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_arm64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-sdk-watchsimulator-11.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_arm64_release_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-sdk-watchsimulator-11.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_arm64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-sdk-watchsimulator-11.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_arm64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-sdk-watchsimulator-11.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_x86_64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-sdk-watchsimulator-11.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_x86_64_release_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-sdk-watchsimulator-11.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_x86_64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-sdk-watchsimulator-11.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_watchos_watchsimulator_11_5_x86_64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "watchOS",
+                "os.version": "11.5",
+                "os.sdk": "watchsimulator",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-sdk-watchsimulator-11.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_x86_64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-macos-15.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_x86_64_release_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-macos-15.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_x86_64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-macos-15.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_x86_64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-macos-15.5",
+        "arch_tag": "amd64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_arm64_debug_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-macos-15.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_arm64_release_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-macos-15.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_arm64_relwithdebinfo_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-macos-15.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_macos_15_5_arm64_minsizerel_apple-clang_17_0",
+            "settings": {
+                "os": "Macos",
+                "os.version": "15.5",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "apple-clang",
+                "compiler.version": "17.0",
+                "compiler.libcxx": "libc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.cmake.cmaketoolchain:generator": "Xcode"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-macos-15.5",
+        "arch_tag": "arm64",
+        "container": "",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv7_debug_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv7",
+                "build_type": "Debug",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-armv7-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv7_release_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv7",
+                "build_type": "Release",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-armv7-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv7_relwithdebinfo_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv7",
+                "build_type": "RelWithDebInfo",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-armv7-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv7_minsizerel_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv7",
+                "build_type": "MinSizeRel",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-armv7-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv8_debug_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv8",
+                "build_type": "Debug",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-armv8-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv8_release_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv8",
+                "build_type": "Release",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-armv8-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv8_relwithdebinfo_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv8",
+                "build_type": "RelWithDebInfo",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-armv8-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_android_armv8_minsizerel_clang_17",
+            "settings": {
+                "os": "Android",
+                "os.api_level": "35",
+                "os.ndk_version": "27",
+                "arch": "armv8",
+                "build_type": "MinSizeRel",
+                "compiler": "clang",
+                "compiler.version": "17",
+                "compiler.libcxx": "c++_static",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.android:ndk_path": "/opt/android-sdk/ndk/27.2.12479018"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-armv8-android-api-35-ndk-27",
+        "arch_tag": "arm64",
+        "container": "android-container-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_debug_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-gcc-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_debug_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-clang-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-clang-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_release_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-gcc-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_release_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-clang-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-clang-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_relwithdebinfo_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-gcc-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_relwithdebinfo_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-clang-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-clang-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_minsizerel_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-gcc-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_x86_64_minsizerel_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-clang-ubuntu-24.10",
+        "arch_tag": "amd64",
+        "container": "ubuntu-clang-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_x86_64_debug_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-gcc-redhat-9.5",
+        "arch_tag": "amd64",
+        "container": "redhat-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_x86_64_release_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-gcc-redhat-9.5",
+        "arch_tag": "amd64",
+        "container": "redhat-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_x86_64_relwithdebinfo_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-gcc-redhat-9.5",
+        "arch_tag": "amd64",
+        "container": "redhat-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_x86_64_minsizerel_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-LINUX-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-gcc-redhat-9.5",
+        "arch_tag": "amd64",
+        "container": "redhat-gcc-amd64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_debug_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-gcc-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_debug_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-clang-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-clang-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_release_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-gcc-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_release_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-clang-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-clang-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_relwithdebinfo_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-gcc-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_relwithdebinfo_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-clang-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-clang-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_minsizerel_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-gcc-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_ubuntu_24_10_arm64_minsizerel_clang_19",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "Ubuntu",
+                "os.distro.version": "24.10",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-clang-ubuntu-24.10",
+        "arch_tag": "arm64",
+        "container": "ubuntu-clang-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_arm64_debug_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "arm64",
+                "build_type": "Debug",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64-gcc-redhat-9.5",
+        "arch_tag": "arm64",
+        "container": "redhat-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_arm64_release_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "arm64",
+                "build_type": "Release",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64-gcc-redhat-9.5",
+        "arch_tag": "arm64",
+        "container": "redhat-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_arm64_relwithdebinfo_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "arm64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64-gcc-redhat-9.5",
+        "arch_tag": "arm64",
+        "container": "redhat-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_linux_redhat_9_5_arm64_minsizerel_gcc_14",
+            "settings": {
+                "os": "Linux",
+                "os.distro": "RedHat",
+                "os.distro.version": "9.5",
+                "arch": "arm64",
+                "build_type": "MinSizeRel",
+                "compiler": "gcc",
+                "compiler.version": "14",
+                "compiler.libcxx": "libstdc++",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-MAC-ARM64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64-gcc-redhat-9.5",
+        "arch_tag": "arm64",
+        "container": "redhat-gcc-arm64",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_debug_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Debug",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-msvc-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_debug_clang_19",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "Debug",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Debug",
+                "compiler.runtime_version": "v144",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.build:cflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:cxxflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:compiler_executables": "{'asm': 'clang-cl', 'cpp': 'clang-cl', 'c': 'clang-cl'}",
+                "tools.cmake.cmaketoolchain:extra_variables": "{'CMAKE_ASM_FLAGS_INIT': '--target=x86_64-pc-windows-msvc'}",
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-x86_64-clang-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-clang",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_release_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-msvc-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_release_clang_19",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "Release",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.runtime_version": "v144",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.build:cflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:cxxflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:compiler_executables": "{'asm': 'clang-cl', 'cpp': 'clang-cl', 'c': 'clang-cl'}",
+                "tools.cmake.cmaketoolchain:extra_variables": "{'CMAKE_ASM_FLAGS_INIT': '--target=x86_64-pc-windows-msvc'}",
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-x86_64-clang-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-clang",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_relwithdebinfo_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-msvc-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_relwithdebinfo_clang_19",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "RelWithDebInfo",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.runtime_version": "v144",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.build:cflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:cxxflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:compiler_executables": "{'asm': 'clang-cl', 'cpp': 'clang-cl', 'c': 'clang-cl'}",
+                "tools.cmake.cmaketoolchain:extra_variables": "{'CMAKE_ASM_FLAGS_INIT': '--target=x86_64-pc-windows-msvc'}",
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-x86_64-clang-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-clang",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_minsizerel_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-msvc-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_x86_64_minsizerel_clang_19",
+            "settings": {
+                "os": "Windows",
+                "arch": "x86_64",
+                "build_type": "MinSizeRel",
+                "compiler": "clang",
+                "compiler.version": "19",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.runtime_version": "v144",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {
+                "tools.build:cflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:cxxflags": [
+                    "--target=x86_64-pc-windows-msvc"
+                ],
+                "tools.build:compiler_executables": "{'asm': 'clang-cl', 'cpp': 'clang-cl', 'c': 'clang-cl'}",
+                "tools.cmake.cmaketoolchain:extra_variables": "{'CMAKE_ASM_FLAGS_INIT': '--target=x86_64-pc-windows-msvc'}",
+                "tools.cmake.cmaketoolchain:generator": "Ninja"
+            },
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-x86_64-clang-windows",
+        "arch_tag": "amd64",
+        "container": "windows-container-clang",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_arm64ec_debug_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "arm64ec",
+                "build_type": "Debug",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Debug",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "debug-arm64ec-msvc-windows",
+        "arch_tag": "arm64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_arm64ec_release_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "arm64ec",
+                "build_type": "Release",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "release-arm64ec-msvc-windows",
+        "arch_tag": "arm64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_arm64ec_relwithdebinfo_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "arm64ec",
+                "build_type": "RelWithDebInfo",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "relwithdebinfo-arm64ec-msvc-windows",
+        "arch_tag": "arm64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    },
+    {
+        "targets": [
+            {
+                "name": "baresip",
+                "version": "3.22.0",
+                "channel": "",
+                "user": ""
+            }
+        ],
+        "profile": {
+            "name": "bb_windows_arm64ec_minsizerel_msvc_194",
+            "settings": {
+                "os": "Windows",
+                "arch": "arm64ec",
+                "build_type": "MinSizeRel",
+                "compiler": "msvc",
+                "compiler.version": "194",
+                "compiler.runtime": "dynamic",
+                "compiler.runtime_type": "Release",
+                "compiler.cppstd": 20,
+                "compiler.cstd": 11
+            },
+            "package_settings": {},
+            "options": {},
+            "tool_requires": {},
+            "conf": {},
+            "build_env": "",
+            "run_env": {
+                "agent": "RA-MARI-DOCKER-WIN-AMD64-GROUP"
+            }
+        },
+        "bb": {
+            "jenkins": {},
+            "gitlab": {},
+            "local": {}
+        },
+        "name": "minsizerel-arm64ec-msvc-windows",
+        "arch_tag": "arm64",
+        "container": "windows-container-msvc",
+        "commit_hash": "ad882ea03f6d62bb88e2538b776f6c25d0dcb241",
+        "status": "not started"
+    }
+]

@@ -1,7 +1,8 @@
 project(swscale)
 
 # Skip if explicitly disabled via Conan
-if(BARESIP_USE_CONAN AND DEFINED CONAN_FFMPEG_ENABLED AND NOT CONAN_FFMPEG_ENABLED)
+if(BARESIP_USE_CONAN AND DEFINED CONAN_FFMPEG_ENABLED AND
+        NOT CONAN_FFMPEG_ENABLED)
     return()
 endif()
 

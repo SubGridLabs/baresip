@@ -1,5 +1,10 @@
 project(sdl)
 
+# Skip SDL module when disabled via Conan
+if(BARESIP_USE_CONAN AND DEFINED CONAN_SDL_ENABLED AND NOT CONAN_SDL_ENABLED)
+    return()
+endif()
+
 # Use Conan's SDL package when available
 if(BARESIP_USE_CONAN)
     find_package(SDL2 QUIET)  # Conan provides SDL2 (uppercase)

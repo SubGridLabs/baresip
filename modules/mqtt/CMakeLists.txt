@@ -1,8 +1,10 @@
 project(mqtt)
 
 # Check if MOSQUITTO is disabled in Conan
-if(BARESIP_USE_CONAN AND DEFINED CONAN_MOSQUITTO_ENABLED AND NOT CONAN_MOSQUITTO_ENABLED)
-    message(STATUS "MOSQUITTO disabled in Conan configuration, skipping mqtt module")
+if(BARESIP_USE_CONAN AND DEFINED CONAN_MOSQUITTO_ENABLED AND
+        NOT CONAN_MOSQUITTO_ENABLED)
+    message(STATUS "MOSQUITTO disabled in Conan configuration, "
+            "skipping mqtt module")
     return()
 endif()
 

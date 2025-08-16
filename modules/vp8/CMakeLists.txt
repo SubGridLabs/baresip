@@ -30,22 +30,22 @@ if(TARGET libvpx::libvpx)
     target_link_libraries(${PROJECT_NAME} PRIVATE libvpx::libvpx)
     # Add to global list for main baresip library linking
     set_property(GLOBAL APPEND PROPERTY BARESIP_LINK_LIBRARIES libvpx::libvpx)
-    # Workaround: Conan libvpx package doesn't provide include directories
-    get_target_property(VPX_INTERFACE_LINK_LIBRARIES libvpx::libvpx INTERFACE_LINK_LIBRARIES)
-    if(VPX_INTERFACE_LINK_LIBRARIES)
-        # Extract libvpx package path and add include directory
-        foreach(lib ${VPX_INTERFACE_LINK_LIBRARIES})
-            if(lib MATCHES "libvpx")
-                get_filename_component(VPX_LIB_DIR "${lib}" DIRECTORY)
-                get_filename_component(VPX_PKG_DIR "${VPX_LIB_DIR}" DIRECTORY)
-                set(VPX_INCLUDE_DIR "${VPX_PKG_DIR}/include")
-                if(EXISTS "${VPX_INCLUDE_DIR}/vpx")
-                    target_include_directories(${PROJECT_NAME} PRIVATE "${VPX_INCLUDE_DIR}")
-                    message(STATUS "VP8: Added libvpx include directory: ${VPX_INCLUDE_DIR}")
-                    break()
-                endif()
-            endif()
-        endforeach()
+    # Workaround: Conan libvpx package doesn't provide include
+    # directories properly
+    # Use the package folder directly from Conan CMake variables
+    if(DEFINED libvpx_PACKAGE_FOLDER_RELEASE)
+        set(VPX_INCLUDE_DIR "${libvpx_PACKAGE_FOLDER_RELEASE}/include")
+        if(EXISTS "${VPX_INCLUDE_DIR}/vpx")
+            target_include_directories(${PROJECT_NAME} PRIVATE
+                    "${VPX_INCLUDE_DIR}")
+            message(STATUS "VP8: Added libvpx include directory: "
+                    "${VPX_INCLUDE_DIR}")
+        else()
+            message(WARNING "VP8: libvpx include directory not found: "
+                    "${VPX_INCLUDE_DIR}")
+        endif()
+    else()
+        message(WARNING "VP8: libvpx_PACKAGE_FOLDER_RELEASE not defined")
     endif()
     message(STATUS "VP8: Using Conan libvpx::libvpx target")
 else()

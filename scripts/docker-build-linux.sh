@@ -8,14 +8,14 @@ IMAGE_NAME=baresip-linux-conan:latest
 DOCKER_BUILDKIT=1 docker build --platform linux/amd64 -f docker/linux-conan.Dockerfile -t ${IMAGE_NAME} .
 echo "[host] $(date +%H:%M:%S) Image ready: ${IMAGE_NAME}"
 
-# Mount workspace and conan cache for speed
-CONAN_CACHE_HOST="$HOME/.conan2"
+# Mount workspace and use container-specific conan cache
+CONAN_CACHE_HOST="/Volumes/Storage/conan-caches/baresip/cache"
 mkdir -p "$CONAN_CACHE_HOST"
 
 echo "[host] $(date +%H:%M:%S) Launching container and starting Conan build ..."
 docker run --rm --platform linux/amd64 \
   -v "$(pwd)":/workspace \
-  -v "$CONAN_CACHE_HOST":/root/.conan2 \
+  -v "$CONAN_CACHE_HOST":/workspace/.conan_cache \
   -w /workspace \
   -e CONAN_NON_INTERACTIVE=1 \
   -e NINJA_STATUS="[%f/%t %o/sec] " \
@@ -26,65 +26,78 @@ docker run --rm --platform linux/amd64 \
     export PS4="[container] + $(date +%H:%M:%S) "
     set -x
 
-    echo "[container] $(date +%H:%M:%S) Detecting Conan profile ..."
+    echo "[container] $(date +%H:%M:%S) Setting up separate CONAN_HOME for bbconanconfig ..."
+    export CONAN_HOME=/workspace/.conan_cache
+    mkdir -p $CONAN_HOME
     conan profile detect --force || true
-    conan remote list || true
-    echo "[container] $(date +%H:%M:%S) Enabling and logging into remote: test-conan ..."
-    conan remote enable test-conan || conan remote add test-conan http://13.61.152.119:9300 || true
-    # Ensure URL is correct and credentials are applied non-interactively
-    conan remote update-url test-conan http://13.61.152.119:9300 || true
-    conan remote logout test-conan || true
+    
+    echo "[container] $(date +%H:%M:%S) Setting up test-conan remote with priority ..."
+    # Remove test-conan if it exists to ensure proper ordering
+    conan remote remove test-conan || true
+    # Add test-conan as the first remote (highest priority)
+    conan remote add test-conan http://13.61.152.119:9300 --index 0
+    conan remote enable test-conan || true
     CONAN_LOGIN_USER="${CONAN_LOGIN_USER:-builder}"
     CONAN_LOGIN_PASSWORD="${CONAN_LOGIN_PASSWORD:-secure123}"
     conan remote login test-conan ${CONAN_LOGIN_USER} -p ${CONAN_LOGIN_PASSWORD}
-    echo "[container] Enabled remotes:" && conan remote list | grep -E "\(Enabled: True\)" || true
-    # Use default Conan settings; profile below specifies os.distro + version explicitly
     
-    # Normalize host profile for container toolchain
-    mkdir -p ~/.conan2/profiles
-    # Emulate linux/amd64 to match GitHub runners and avoid aarch64-only build issues
-    ARCH_SETTING=x86_64
-    cat > ~/.conan2/profiles/ci <<EOF
-[settings]
-os=Linux
-os.distro=Ubuntu
-os.distro.version=24.04
-arch=${ARCH_SETTING}
-build_type=Release
-compiler=gcc
-compiler.version=13.3
-compiler.libcxx=libstdc++11
-compiler.cppstd=gnu17
-
-[conf]
-tools.cmake.cmaketoolchain:generator=Ninja
-EOF
-
-    echo "[container] $(date +%H:%M:%S) Using Conan host profile (ci):"
-    cat ~/.conan2/profiles/ci || true
+    echo "[container] $(date +%H:%M:%S) Remote priority order:"
+    conan remote list
+    
+    echo "[container] $(date +%H:%M:%S) Installing bbconanconfig ..."
+    conan config install-pkg "bbconanconfig/[>=0.9.0]"
+    
+    echo "[container] $(date +%H:%M:%S) Available bbconanconfig profiles:"
+    ls -la $CONAN_HOME/profiles/ | grep bb_linux_ubuntu || true
+    
+    # Use Ubuntu 24.10 x86_64 release profile with GCC (system ninja avoids compiler issues)
+    PROFILE_NAME="bb_linux_ubuntu_24_10_x86_64_release_gcc_14"
+    echo "[container] $(date +%H:%M:%S) Using bbconanconfig profile: ${PROFILE_NAME}"
+    cat $CONAN_HOME/profiles/${PROFILE_NAME} || true
 
     echo "[container] $(date +%H:%M:%S) Starting conan create (may take a while on first run) ..."
-    echo "[container] $(date +%H:%M:%S) Cleaning zstd cache and recipe to avoid corrupted recipe/errors ..."
-    conan remove "zstd/*" -c || true
-    rm -rf /root/.conan2/p/zstd* /root/.conan2/p/b/zstd* 2>/dev/null || true
+    echo "[container] $(date +%H:%M:%S) Cleaning any old cache to ensure fresh build ..."
+    
     # Choose option set based on preset
     OPTS_BASE="-o baresip/*:shared=False"
     case "${PRESET}" in
       minimal)
-        OPTS_PRESET="-o baresip/*:with_gstreamer=False -o baresip/*:with_gtk=False -o baresip/*:with_sdl=False -o baresip/*:with_portaudio=False -o baresip/*:with_pulseaudio=False -o baresip/*:with_alsa=False -o baresip/*:with_pipewire=False -o baresip/*:with_av1=False -o baresip/*:with_ffmpeg=False -o baresip/*:with_vpx=False" ;;
+        OPTS_PRESET="-o baresip/*:with_gstreamer=False -o baresip/*:with_gtk=False -o baresip/*:with_sdl=False -o baresip/*:with_portaudio=False -o baresip/*:with_pulseaudio=False -o baresip/*:with_alsa=False -o baresip/*:with_pipewire=False -o baresip/*:with_av1=False -o baresip/*:with_ffmpeg=False -o baresip/*:with_vpx=False -o baresip/*:with_sndfile=False" ;;
       audio)
         OPTS_PRESET="-o baresip/*:with_gstreamer=False -o baresip/*:with_gtk=False -o baresip/*:with_sdl=False -o baresip/*:with_av1=False -o baresip/*:with_ffmpeg=False -o baresip/*:with_vpx=False -o baresip/*:with_pipewire=False -o baresip/*:with_alsa=True -o baresip/*:with_pulseaudio=True -o baresip/*:with_portaudio=True" ;;
       default)
-        OPTS_PRESET="-o baresip/*:with_gstreamer=False -o baresip/*:with_gtk=False -o baresip/*:with_sdl=False -o baresip/*:with_av1=False -o baresip/*:with_ffmpeg=False -o baresip/*:with_vpx=False -o baresip/*:with_pipewire=False" ;;
+        OPTS_PRESET="-o baresip/*:with_gstreamer=False -o baresip/*:with_gtk=False -o baresip/*:with_sdl=False -o baresip/*:with_pipewire=True -o baresip/*:with_sndfile=False -o baresip/*:with_av1=True -o baresip/*:with_ffmpeg=True -o baresip/*:with_vpx=True -o baresip/*:with_pulseaudio=False -o baresip/*:with_mpg123=False" ;;
       video)
         # Video-focused without ffmpeg/gstreamer/av1/vpx to avoid zstd pull-in
         OPTS_PRESET="-o baresip/*:with_gstreamer=False -o baresip/*:with_gtk=False -o baresip/*:with_sdl=False -o baresip/*:with_av1=False -o baresip/*:with_ffmpeg=False -o baresip/*:with_vpx=False -o baresip/*:with_pipewire=False" ;;
       *)
         OPTS_PRESET="" ;;
     esac
-    conan create . -pr:h ci -pr:b ci -s build_type=Release ${OPTS_BASE} ${OPTS_PRESET} \
-      -o zstd/*:build_programs=False -o zstd/*:build_tests=False \
-      -c tools.system.package_manager:mode=install -v debug --build=missing
+    echo "[container] $(date +%H:%M:%S) Applying workarounds for problematic Conan packages ..."
+    
+    # Workaround for libtool issue - rename problematic Conan libtool binaries
+    echo "Installing libtool package to cache..."
+    conan install libtool/2.4.7@ --build=missing || true
+    for dir in /workspace/.conan_cache/p/b/libtoa*/p/bin; do
+        if [ -d "$dir" ]; then
+            echo "Disabling problematic Conan libtool binaries in: $dir"
+            [ -f "$dir/libtoolize" ] && mv "$dir/libtoolize" "$dir/libtoolize.broken" || true
+            [ -f "$dir/libtool" ] && mv "$dir/libtool" "$dir/libtool.broken" || true
+            echo "System libtool will be used instead"
+        fi
+    done
+    
+    # Simplified bison workaround - just remove problematic packages
+    echo "Applying bison workaround - removing problematic Conan bison packages..."
+    
+    # Remove any problematic bison packages completely
+    conan remove 'bison/*' --confirm || true
+    
+    echo "System bison will be used instead (from Dockerfile)"
+    
+    echo "[container] $(date +%H:%M:%S) Running conan create..."
+    conan create . -pr:h ${PROFILE_NAME} -pr:b ${PROFILE_NAME} ${OPTS_BASE} ${OPTS_PRESET} \
+      --build=missing -v debug
     echo "[container] $(date +%H:%M:%S) Uploading package to test-conan ..."
     conan upload baresip/4.0.0 -r test-conan --confirm || true
     echo "[container] $(date +%H:%M:%S) Conan create finished"

@@ -1,6 +1,7 @@
 project(alsa)
 
-# Prefer Conan's CMake package (CMakeDeps) if available, fallback to system FindALSA
+# Prefer Conan's CMake package (CMakeDeps) if available, fallback to
+# system FindALSA
 find_package(ALSA CONFIG QUIET)
 if(NOT ALSA_FOUND)
   find_package(ALSA QUIET)
@@ -21,7 +22,8 @@ else()
   add_library(${PROJECT_NAME} MODULE ${SRCS})
 endif()
 
-# When using Conan (ALSA::ALSA target), includes and link flags are propagated by the target
+# When using Conan (ALSA::ALSA target), includes and link flags are
+# propagated by the target
 if(TARGET ALSA::ALSA)
   target_link_libraries(${PROJECT_NAME} PRIVATE ALSA::ALSA)
 else()

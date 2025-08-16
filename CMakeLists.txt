@@ -38,8 +38,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 option(USE_CONAN "Use Conan for dependency management" ON)
 
 # Detect if we're using Conan by checking multiple indicators
-if(USE_CONAN AND (DEFINED BARESIP_USE_CONAN OR 
-                  EXISTS "${CMAKE_BINARY_DIR}/conan_toolchain.cmake" OR 
+if(USE_CONAN AND (DEFINED BARESIP_USE_CONAN OR
+                  EXISTS "${CMAKE_BINARY_DIR}/conan_toolchain.cmake" OR
                   EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_toolchain.cmake" OR
                   DEFINED CONAN_CMAKE_VERSION))
     set(BARESIP_USE_CONAN TRUE)
@@ -47,7 +47,8 @@ if(USE_CONAN AND (DEFINED BARESIP_USE_CONAN OR
     message(STATUS "Using Conan for dependency management")
 else()
     set(BARESIP_USE_CONAN FALSE)
-    message(STATUS "Conan not detected, using traditional dependency management")
+    message(STATUS "Conan not detected, using traditional dependency "
+            "management")
 endif()
 
 ##############################################################################
@@ -84,6 +85,19 @@ set(CMAKE_C_STANDARD 11)
 if(APPLE)
   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
+
+# Enhanced RPATH configuration for Conan builds
+if(BARESIP_USE_CONAN)
+  # Set RPATH to find modules relative to executable for Conan packages
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@executable_path/../lib/baresip/modules;@executable_path/../lib")
+  else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/baresip/modules:$ORIGIN/../lib")
+  endif()
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  
+  message(STATUS "Conan build: Setting module RPATH for relative module loading")
 endif()
 
 if(MSVC)
@@ -138,13 +152,15 @@ endif()
 # Try to find RE via Conan first (CMakeDeps), then fallback to local config
 if(BARESIP_USE_CONAN)
     # Prefer the CMake package name used by the library itself
-    find_package(re CONFIG QUIET)
-    if(re_FOUND)
-        message(STATUS "Found RE via Conan as re::re")
+    find_package(libre CONFIG QUIET)
+    if(libre_FOUND)
+        message(STATUS "Found RE via Conan as libre::libre")
         set(RE_FOUND TRUE)
-        set(RE_LIBRARIES re::re)
-        get_target_property(RE_INCLUDE_DIRS_RAW re::re INTERFACE_INCLUDE_DIRECTORIES)
-        string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
+        set(RE_LIBRARIES libre::libre)
+        get_target_property(RE_INCLUDE_DIRS_RAW libre::libre
+                INTERFACE_INCLUDE_DIRECTORIES)
+        string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1"
+                RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
         set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}")
     else()
         # Some recipes expose libre::libre with cmake_file_name=libre
@@ -153,11 +169,15 @@ if(BARESIP_USE_CONAN)
             message(STATUS "Found RE via Conan as libre::libre")
             set(RE_FOUND TRUE)
             set(RE_LIBRARIES libre::libre)
-            get_target_property(RE_INCLUDE_DIRS_RAW libre::libre INTERFACE_INCLUDE_DIRECTORIES)
-            string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1" RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
+            get_target_property(RE_INCLUDE_DIRS_RAW libre::libre
+                    INTERFACE_INCLUDE_DIRECTORIES)
+            string(REGEX REPLACE "\\$<\\$<CONFIG:[^>]*>:([^>]+)>" "\\1"
+                    RE_INCLUDE_BASE "${RE_INCLUDE_DIRS_RAW}")
             set(RE_INCLUDE_DIRS "${RE_INCLUDE_BASE}")
         else()
-            message(FATAL_ERROR "libre (RE) not found via Conan CMakeDeps. Ensure CMake is using conan_toolchain.cmake and CMakeDeps is generated.")
+            message(FATAL_ERROR "libre (RE) not found via Conan CMakeDeps. "
+                                "Ensure CMake is using conan_toolchain.cmake "
+                                "and CMakeDeps is generated.")
         endif()
     endif()
 else()
@@ -185,6 +205,12 @@ if(MOD_PATH)
   add_definitions(-DMOD_PATH="${MOD_PATH}")
 elseif(CMAKE_INSTALL_FULL_LIBDIR)
   add_definitions(-DMOD_PATH="${CMAKE_INSTALL_FULL_LIBDIR}/baresip/modules")
+endif()
+
+# For Conan builds, we rely on RPATH for module discovery
+# instead of hardcoded paths, so PREFIX is not set to avoid absolute paths
+if(BARESIP_USE_CONAN)
+  add_definitions(-DBARESIP_USE_CONAN)
 endif()
 
 if(SHARE_PATH)
@@ -326,7 +352,8 @@ endif()
 set(LINKLIBS ${RE_LIBRARIES} ${RE_LIBS})
 
 # If the RE package also provides a REM (media) target, link it as well.
-# This resolves undefined symbols such as aubuf_*, rtp_*, sdp_*, etc. in shared builds.
+# This resolves undefined symbols such as aubuf_*, rtp_*, sdp_*, etc.
+# in shared builds.
 set(REM_LIBRARIES "")
 if(TARGET rem::rem)
   set(REM_LIBRARIES rem::rem)
@@ -355,7 +382,8 @@ if(MODULE_LINK_LIBRARIES)
   if("libvpx::libvpx" IN_LIST MODULE_LINK_LIBRARIES AND BARESIP_USE_CONAN)
     find_package(libvpx QUIET)
   endif()
-  if("libaom-av1::libaom-av1" IN_LIST MODULE_LINK_LIBRARIES AND BARESIP_USE_CONAN)
+  if("libaom-av1::libaom-av1" IN_LIST MODULE_LINK_LIBRARIES AND
+          BARESIP_USE_CONAN)
     find_package(libaom-av1 QUIET)
   endif()
   if("SDL2::SDL2" IN_LIST MODULE_LINK_LIBRARIES AND BARESIP_USE_CONAN)

@@ -1,8 +1,10 @@
 project(avcodec)
 
 # Check if FFMPEG is disabled in Conan
-if(BARESIP_USE_CONAN AND DEFINED CONAN_FFMPEG_ENABLED AND NOT CONAN_FFMPEG_ENABLED)
-    message(STATUS "FFMPEG disabled in Conan configuration, skipping avcodec module")
+if(BARESIP_USE_CONAN AND DEFINED CONAN_FFMPEG_ENABLED AND
+        NOT CONAN_FFMPEG_ENABLED)
+    message(STATUS "FFMPEG disabled in Conan configuration, "
+            "skipping avcodec module")
     return()
 endif()
 

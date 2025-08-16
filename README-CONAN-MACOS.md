@@ -397,11 +397,25 @@ This project uses modern Conan-based GitHub Actions workflows:
 - **🐧 Conan Linux Build** - Builds using `bb_linux_ubuntu_24_10_x86_64_release_gcc_14` profile  
 - **🔍 Lint Check** - Code quality checks (ccheck, CMakeLint, pylint)
 
+### Dynamic Versioning:
+Each build gets a unique package version based on git context:
+
+- **Pull Requests**: `4.0.0-pr{number}-{git_hash}` (e.g., `4.0.0-pr123-abc1234`)
+- **Main Branch**: `4.0.0` (stable release version)
+- **Other Branches**: `4.0.0-{branch}-{git_hash}` (e.g., `4.0.0-feature-branch-abc1234`)
+
+This ensures:
+✅ Each commit gets a unique package  
+✅ No conflicts between different PRs/branches  
+✅ Easy identification of which code produced which package  
+✅ Proper cache reuse for identical code  
+
 ### Workflow Features:
-- Uses `conan create` with `--build=missing` for efficient dependency management
+- Uses `conan create` with `--version=${DYNAMIC_VERSION}` for unique packages per commit
 - Automatic upload of built packages to test-conan artifactory
-- Version verification tests to ensure correct v4.0.0 deployment
+- Version verification tests to ensure correct deployment
 - Profile-based builds using bbconanconfig package from artifactory
+- Graceful handling of missing authentication secrets
 
 ### Legacy Workflows:
 Legacy workflows (build.yml, windows.yml, fedora.yml, etc.) are automatically disabled when `conanfile.py` is present, ensuring clean CI runs focused on Conan integration.

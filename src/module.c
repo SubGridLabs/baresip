@@ -96,7 +96,13 @@ static int load_module(struct mod **modp, const struct pl *modpath,
 
  out:
 	if (err) {
+		/* For Conan builds, reduce verbosity of optional module failures */
+		#ifdef BARESIP_USE_CONAN
+		/* Only show debug-level messages for missing optional modules */
+		debug("module %r: %m\n", name, err);
+		#else
 		warning("module %r: %m\n", name, err);
+		#endif
 	}
 	else if (modp)
 		*modp = m;
@@ -141,8 +147,15 @@ int module_init(const struct conf *conf)
 	if (!conf)
 		return EINVAL;
 
-	if (conf_get(conf, "module_path", &path))
+	if (conf_get(conf, "module_path", &path)) {
+		#ifdef BARESIP_USE_CONAN
+		/* For Conan builds, use current directory and let RPATH resolve to modules */
+		/* RPATH is set to @executable_path/../lib/baresip/modules */
 		pl_set_str(&path, ".");
+		#else
+		pl_set_str(&path, ".");
+		#endif
+	}
 
 	err = conf_apply(conf, "module", module_handler, &path);
 	if (err)

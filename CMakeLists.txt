@@ -91,13 +91,15 @@ endif()
 if(BARESIP_USE_CONAN)
   # Set RPATH to find modules relative to executable for Conan packages
   if(APPLE)
-    set(CMAKE_INSTALL_RPATH "@executable_path/../lib/baresip/modules;@executable_path/../lib")
+    set(CMAKE_INSTALL_RPATH
+        "@executable_path/../lib/baresip/modules;@executable_path/../lib")
   else()
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/baresip/modules:$ORIGIN/../lib")
   endif()
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  
-  message(STATUS "Conan build: Setting module RPATH for relative module loading")
+
+  message(STATUS
+          "Conan build: Setting module RPATH for relative module loading")
 endif()
 
 if(MSVC)

@@ -9,18 +9,18 @@ import re
 def get_dynamic_version():
     """Generate dynamic version based on git context and environment"""
     base_version = "4.0.0"
-    
+
     try:
         # Get git hash
         git_hash = subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"], 
+            ["git", "rev-parse", "--short", "HEAD"],
             stderr=subprocess.DEVNULL
         ).decode().strip()
-        
+
         # Check for GitHub environment variables
         github_event_name = os.environ.get("GITHUB_EVENT_NAME")
-        github_ref_name = os.environ.get("GITHUB_REF_NAME") 
-        
+        github_ref_name = os.environ.get("GITHUB_REF_NAME")
+
         # For PRs, extract number from GITHUB_REF (refs/pull/123/merge)
         if github_event_name == "pull_request":
             github_ref = os.environ.get("GITHUB_REF", "")
@@ -260,14 +260,16 @@ class BaresipConan(ConanFile):
             self.requires("libsndfile/[>=1.0 <2]")
 
     def build_requirements(self):
-        # Use system cmake on Linux/macOS when available, Conan cmake for Windows
+        # Use system cmake on Linux/macOS when available, Conan cmake
+        # for Windows
         # This avoids issues with corrupted cmake packages for some platforms
         if self.settings.os == "Windows":
             # Use CMake 3.27.9 for compatibility with all deps including bzip2
             self.tool_requires("cmake/3.27.9")
-        
-        # Note: gettext and libtool will automatically be resolved from test-conan first
-        # due to remote priority order (test-conan has --index 0 in docker setup)
+
+        # Note: gettext and libtool will automatically be resolved from
+        # test-conan first due to remote priority order (test-conan has
+        # --index 0 in docker setup)
         # No special handling needed - Conan checks remotes in priority order
 
     def layout(self):
@@ -294,16 +296,19 @@ class BaresipConan(ConanFile):
         tc.variables["CONAN_PNG_ENABLED"] = self.options.with_png
         tc.variables["CONAN_SNDFILE_ENABLED"] = self.options.with_sndfile
         tc.variables["CONAN_VPX_ENABLED"] = self.options.with_vpx
-        # Re-enable tests for Conan CI; we want to run unit tests in a separate stage
-        # CI workflows can still override via -DBARESIP_BUILD_TESTS=OFF if needed
+        # Re-enable tests for Conan CI; we want to run unit tests in a
+        # separate stage. CI workflows can still override via
+        # -DBARESIP_BUILD_TESTS=OFF if needed
         tc.variables["BARESIP_BUILD_TESTS"] = True
 
         # Note: Keep STATIC=False to avoid complex static linking issues
         # Modules will be .so files but still work properly
 
-        # For Conan packages, rely on RPATH-based module discovery instead of 
-        # setting MOD_PATH to avoid compiling absolute paths into the binary.
-        # The RPATH configuration in CMakeLists.txt ensures module discovery works.
+        # For Conan packages, rely on RPATH-based module discovery
+        # instead of setting MOD_PATH to avoid compiling absolute paths
+        # into the binary.
+        # The RPATH configuration in CMakeLists.txt ensures module discovery
+        # works.
         # MOD_PATH is intentionally not set here.
 
         tc.generate()

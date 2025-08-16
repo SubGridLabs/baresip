@@ -1,0 +1,36 @@
+# Pre-commit configuration for baresip
+# To install: pip install pre-commit && pre-commit install
+# To run manually: pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      - id: ccheck
+        name: C/C++/Python Code Style Check
+        entry: test/ccheck.py
+        language: python
+        args: ['-e', 'baresipbus.*']
+        files: \.(c|cpp|h|py)$
+        pass_filenames: true
+        description: Run baresip's ccheck.py linter on C/C++/Python files
+      
+      - id: cmake-lint-check
+        name: CMake Lint Check
+        entry: bash
+        language: system
+        args: ['-c', 'if command -v cmake-lint >/dev/null 2>&1; then cmake-lint --disabled-codes C0103,C0301 .; else echo "⚠️  cmake-lint not found, skipping"; fi']
+        files: CMakeLists\.txt|\.cmake$
+        pass_filenames: false
+        description: Run cmake-lint if available
+        
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.(md|rst)$
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-yaml
+        exclude: \.github/workflows/.*\.yml$ # Skip GitHub Actions (they have special syntax)
+      - id: check-added-large-files
+        args: ['--maxkb=1000']

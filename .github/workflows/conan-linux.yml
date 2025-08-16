@@ -40,79 +40,110 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install system dependencies
+    - name: Build Docker image
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          cmake \
-          gcc-14 \
-          g++-14 \
-          pkg-config \
-          python3 \
-          python3-pip \
-          python3-venv
-        
-        # Set GCC 14 as default
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+        echo "🐳 Building Docker image with all dependencies..."
+        DOCKER_BUILDKIT=1 docker build --platform linux/amd64 -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
-    - name: Install Conan
+    - name: Build baresip in Docker container
       run: |
-        python -m pip install --upgrade pip
-        pip install "conan>=2.0"
-
-    - name: Setup Conan
-      run: |
-        conan profile detect --force
-        
-        # Add test-conan remote with higher priority
-        conan remote add test-conan http://13.61.152.119:9300 --force
-        conan remote list
-        
-        # Login to test-conan
-        echo "${{ secrets.CONAN_PASSWORD }}" | conan remote login test-conan ${{ secrets.CONAN_USER }}
-        
-        # Install bbconanconfig
-        conan config install-pkg bbconanconfig/0.9.5
-        
-    - name: Build with Conan
-      run: |
-        echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
+        echo "🏗️ Building baresip with Conan in Docker container..."
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
-        # The version is now dynamically generated in conanfile.py
-        conan create . \
-          -pr:h ${{ matrix.profile }} \
-          -pr:b ${{ matrix.profile }} \
-          ${{ matrix.config.opts }} \
-          --build=missing
+        # Create temporary cache directory for GitHub Actions
+        mkdir -p /tmp/conan-cache
+        
+        # Run build in our Docker container (similar to scripts/docker-build-linux.sh)
+        docker run --rm --platform linux/amd64 \
+          -v "$(pwd)":/workspace \
+          -v "/tmp/conan-cache":/workspace/.conan_cache \
+          -w /workspace \
+          -e CONAN_NON_INTERACTIVE=1 \
+          -e CONAN_HOME=/workspace/.conan_cache \
+          -e GITHUB_EVENT_NAME="${{ github.event_name }}" \
+          -e GITHUB_REF_NAME="${{ github.ref_name }}" \
+          -e GITHUB_REF="${{ github.ref }}" \
+          baresip-linux-conan:latest \
+          bash -c "
+            echo '🔧 Configuring Conan in container...'
+            
+            # Add remotes
+            conan remote add test-conan http://13.61.152.119:9300 --force
+            conan remote add conancenter https://center.conan.io --force
+            
+            # Authenticate if secrets are available
+            if [[ -n '${{ secrets.CONAN_USER }}' && -n '${{ secrets.CONAN_PASSWORD }}' ]]; then
+              echo '🔐 Authenticating to test-conan...'
+              echo '${{ secrets.CONAN_PASSWORD }}' | conan remote login test-conan '${{ secrets.CONAN_USER }}' --password-stdin
+              
+              # Install bbconanconfig
+              conan config install-pkg bbconanconfig/0.9.5@ || echo '⚠️ Could not install bbconanconfig, continuing with default profile'
+            else
+              echo '⚠️ No authentication secrets found, using default profile'
+            fi
+            
+            # Try to use bbconfig profile if available, otherwise fall back to default
+            if conan profile show ${{ matrix.profile }} >/dev/null 2>&1; then
+              PROFILE_ARG='-pr:h ${{ matrix.profile }} -pr:b ${{ matrix.profile }}'
+              echo '✅ Using bbconfig profile: ${{ matrix.profile }}'
+            else
+              PROFILE_ARG=''
+              echo '⚠️ bbconfig profile not found, using default profile'
+            fi
+            
+            echo '🏗️ Building baresip package...'
+            conan create . \
+              \$PROFILE_ARG \
+              ${{ matrix.config.opts }} \
+              --build=baresip
+          "
           
     - name: Upload packages to artifactory
       if: success()
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
-                # Upload baresip package (get version from conan cache)
-        BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
-        echo "📦 Uploading baresip version: ${BARESIP_VERSION}"
-        conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm
-        
-        # Upload any other packages that might have been built
-        conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do
-          if [[ "$package" != "baresip"* ]]; then
-            echo "📦 Checking if $package was built and needs upload..."
-            conan upload "$package" -r=test-conan --confirm || true
-          fi
-        done
+        # Run upload in the same Docker container where packages were built
+        docker run --rm --platform linux/amd64 \
+          -v "$(pwd)":/workspace \
+          -v "/tmp/conan-cache":/workspace/.conan_cache \
+          -w /workspace \
+          -e CONAN_NON_INTERACTIVE=1 \
+          -e CONAN_HOME=/workspace/.conan_cache \
+          baresip-linux-conan:latest \
+          bash -c "
+            # Re-add remotes and authenticate (container state is not preserved)
+            conan remote add test-conan http://13.61.152.119:9300 --force
+            conan remote add conancenter https://center.conan.io --force
+            
+            if [[ -n '${{ secrets.CONAN_USER }}' && -n '${{ secrets.CONAN_PASSWORD }}' ]]; then
+              echo '🔐 Authenticating to test-conan...'
+              echo '${{ secrets.CONAN_PASSWORD }}' | conan remote login test-conan '${{ secrets.CONAN_USER }}' --password-stdin
+              
+              # Upload baresip package (get version from conan cache)
+              BARESIP_VERSION=\$(conan list 'baresip/*' --cache --format=compact | grep 'baresip/' | cut -d'/' -f2 | head -1)
+              echo '📦 Uploading baresip version: \${BARESIP_VERSION}'
+              conan upload \"baresip/\${BARESIP_VERSION}\" -r=test-conan --confirm
+              
+              # Upload any other packages that might have been built
+              conan list '*' --cache | grep -E '^[a-zA-Z]' | while read package; do
+                if [[ \"\$package\" != \"baresip\"* ]]; then
+                  echo '📦 Checking if \$package was built and needs upload...'
+                  conan upload \"\$package\" -r=test-conan --confirm || true
+                fi
+              done
+            else
+              echo '⚠️ No authentication secrets found, skipping upload'
+            fi
+          "
         
     - name: ✅ Build completed successfully  
       run: |
         echo "✅ Build and upload completed successfully!"
-        BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
+        # Get version from Docker container cache
+        BARESIP_VERSION=$(docker run --rm --platform linux/amd64 \
+          -v "/tmp/conan-cache":/workspace/.conan_cache \
+          -e CONAN_HOME=/workspace/.conan_cache \
+          baresip-linux-conan:latest \
+          bash -c "conan list 'baresip/*' --cache --format=compact | grep 'baresip/' | cut -d'/' -f2 | head -1" || echo "unknown")
         echo "📦 Built and uploaded baresip version: ${BARESIP_VERSION}"

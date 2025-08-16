@@ -30,14 +30,14 @@ if(DEFINED BARESIP_USE_CONAN AND BARESIP_USE_CONAN)
         if(NOT ${PACKAGE_NAME}_FOUND)
             if(ARGS_FALLBACK_MODULE)
                 message(STATUS "Conan package ${PACKAGE_NAME} not found, "
-                               "trying system package with ${ARGS_FALLBACK_MODULE}")
+                  "trying system package with ${ARGS_FALLBACK_MODULE}")
                 include(${ARGS_FALLBACK_MODULE})
             else()
                 message(STATUS "Conan package ${PACKAGE_NAME} not found, "
-                               "trying system package")
+                  "trying system package")
                 if(ARGS_COMPONENTS)
                     find_package(${PACKAGE_NAME} ${ARGS_COMPONENTS}
-                                 ${ARGS_QUIET} ${ARGS_REQUIRED})
+                      ${ARGS_QUIET} ${ARGS_REQUIRED})
                 else()
                     find_package(${PACKAGE_NAME} ${ARGS_QUIET} ${ARGS_REQUIRED})
                 endif()
@@ -83,7 +83,7 @@ if(DEFINED BARESIP_USE_CONAN AND BARESIP_USE_CONAN)
         endif()
 
         if(CONAN_FFMPEG_ENABLED AND
-           MODULE_NAME MATCHES "av(codec|filter|format)")
+          MODULE_NAME MATCHES "av(codec|filter|format)")
             find_conan_package_with_fallback(ffmpeg FALLBACK_MODULE FindFFMPEG)
             if(ffmpeg_FOUND)
                 if(MODULE_NAME MATCHES "avcodec")
@@ -99,7 +99,7 @@ if(DEFINED BARESIP_USE_CONAN AND BARESIP_USE_CONAN)
         # Audio systems
         if(CONAN_PORTAUDIO_ENABLED AND MODULE_NAME MATCHES "portaudio")
             find_conan_package_with_fallback(portaudio
-                                             FALLBACK_MODULE FindPORTAUDIO)
+              FALLBACK_MODULE FindPORTAUDIO)
             if(portaudio_FOUND)
                 link_conan_target(${MODULE_NAME} portaudio::portaudio)
             endif()
@@ -107,7 +107,7 @@ if(DEFINED BARESIP_USE_CONAN AND BARESIP_USE_CONAN)
 
         if(CONAN_PULSEAUDIO_ENABLED AND MODULE_NAME MATCHES "pulse")
             find_conan_package_with_fallback(pulseaudio
-                                             FALLBACK_MODULE FindPULSE)
+              FALLBACK_MODULE FindPULSE)
             if(pulseaudio_FOUND)
                 link_conan_target(${MODULE_NAME} pulseaudio::pulseaudio)
             endif()
@@ -130,7 +130,7 @@ if(DEFINED BARESIP_USE_CONAN AND BARESIP_USE_CONAN)
 
         if(CONAN_SNDFILE_ENABLED AND MODULE_NAME MATCHES "sndfile")
             find_conan_package_with_fallback(libsndfile
-                                             FALLBACK_MODULE FindSNDFILE)
+              FALLBACK_MODULE FindSNDFILE)
             if(libsndfile_FOUND)
                 link_conan_target(${MODULE_NAME} libsndfile::libsndfile)
             endif()
@@ -138,7 +138,7 @@ if(DEFINED BARESIP_USE_CONAN AND BARESIP_USE_CONAN)
 
         if(CONAN_MOSQUITTO_ENABLED AND MODULE_NAME MATCHES "mqtt")
             find_conan_package_with_fallback(libmosquitto
-                                             FALLBACK_MODULE FindMOSQUITTO)
+              FALLBACK_MODULE FindMOSQUITTO)
             if(libmosquitto_FOUND)
                 link_conan_target(${MODULE_NAME} libmosquitto::libmosquitto)
             endif()

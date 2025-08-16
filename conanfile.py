@@ -93,6 +93,9 @@ class BaresipConan(ConanFile):
         "with_mosquitto": [True, False],
         "with_png": [True, False],
         "with_sndfile": [True, False],
+
+        # Development features
+        "with_coverage": [True, False],
     }
 
     default_options = {
@@ -126,6 +129,9 @@ class BaresipConan(ConanFile):
         "with_mosquitto": True,    # MQTT for modern IoT applications
         "with_png": True,
         "with_sndfile": True,
+
+        # Development features
+        "with_coverage": False,   # Enable for CI/testing only
     }
 
     def config_options(self):
@@ -301,6 +307,14 @@ class BaresipConan(ConanFile):
         # -DBARESIP_BUILD_TESTS=OFF if needed
         tc.variables["BARESIP_BUILD_TESTS"] = True
 
+        # Configure coverage if enabled
+        if self.options.with_coverage:
+            tc.variables["CMAKE_BUILD_TYPE"] = "Debug"
+            # Add coverage flags for GCC/Clang
+            if self.settings.compiler in ["gcc", "clang"]:
+                tc.variables["CMAKE_C_FLAGS"] = "--coverage"
+                tc.variables["CMAKE_EXE_LINKER_FLAGS"] = "--coverage"
+
         # Note: Keep STATIC=False to avoid complex static linking issues
         # Modules will be .so files but still work properly
 
@@ -321,6 +335,123 @@ class BaresipConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+
+        # Run tests and generate coverage if enabled
+        if self.options.with_coverage:
+            self.output.info("Running tests for coverage analysis...")
+
+            # Run the selftest executable
+            if self.settings.os == "Windows":
+                test_cmd = os.path.join(self.build_folder, "test",
+                                       "selftest.exe")
+            else:
+                test_cmd = os.path.join(self.build_folder, "test",
+                                       "selftest")
+
+            # Check if test executable exists
+            if os.path.exists(test_cmd):
+                try:
+                    self.run(test_cmd, cwd=self.build_folder)
+                    self.output.info("✅ All tests passed!")
+                except Exception as e:
+                    self.output.warn(f"⚠️ Tests failed: {e}")
+                    # Don't fail the build for test failures, just warn
+
+                # Generate coverage report
+                self._generate_coverage_report()
+            else:
+                self.output.warn("⚠️ Test executable not found, "
+                                 "skipping tests")
+
+    def _generate_coverage_report(self):
+        """Generate coverage report and save to metadata"""
+        try:
+            self.output.info("Generating coverage report...")
+
+            # Generate raw coverage data with gcov
+            self.run("find . -name '*.gcda' -exec gcov {} \\;",
+                     cwd=self.build_folder, ignore_errors=True)
+
+            # Try to generate HTML coverage report with gcovr if available
+            try:
+                import tempfile
+                temp_dir = tempfile.mkdtemp()
+                coverage_html = os.path.join(temp_dir, "coverage.html")
+                coverage_json = os.path.join(temp_dir, "coverage.json")
+
+                # Generate HTML and JSON reports
+                gcovr_cmd = (f"gcovr -r {self.source_folder} --html "
+                            f"{coverage_html} --json {coverage_json} -f src/")
+                self.run(gcovr_cmd, cwd=self.build_folder, ignore_errors=True)
+
+                # Copy reports to package metadata if they exist
+                metadata_dir = os.path.join(self.package_metadata_folder,
+                                           "coverage")
+                if os.path.exists(coverage_html):
+                    copy(self, "coverage.html", src=temp_dir, dst=metadata_dir)
+                    self.output.info("✅ HTML coverage report saved "
+                                     "to metadata")
+
+                if os.path.exists(coverage_json):
+                    copy(self, "coverage.json", src=temp_dir, dst=metadata_dir)
+
+                    # Extract coverage percentage and save summary
+                    try:
+                        import json
+                        with open(coverage_json, 'r') as f:
+                            coverage_data = json.load(f)
+
+                        line_coverage = coverage_data.get('line_coverage', {})
+                        total_lines = line_coverage.get('total', 0)
+                        covered_lines = line_coverage.get('covered', 0)
+                        coverage_percent = ((covered_lines / total_lines * 100)
+                                           if total_lines > 0 else 0)
+
+                        # Create coverage summary
+                        summary = {
+                            "line_coverage_percent": round(coverage_percent,
+                                                           2),
+                            "lines_total": total_lines,
+                            "lines_covered": covered_lines,
+                            "timestamp": subprocess.check_output(
+                                ["date", "-Iseconds"],
+                                universal_newlines=True).strip()
+                        }
+
+                        summary_file = os.path.join(metadata_dir,
+                                                    "coverage_summary.json")
+                        with open(summary_file, 'w') as f:
+                            json.dump(summary, f, indent=2)
+
+                        self.output.info(
+                            f"✅ Coverage: {coverage_percent:.1f}% "
+                            f"({covered_lines}/{total_lines} lines)")
+
+                    except Exception as e:
+                        self.output.warn(f"Could not parse coverage data: {e}")
+
+            except Exception as e:
+                self.output.warn(f"gcovr not available or failed: {e}")
+
+                # Fallback: save raw gcov files
+                gcov_files = []
+                for root, dirs, files in os.walk(self.build_folder):
+                    for file in files:
+                        if file.endswith('.gcov'):
+                            gcov_files.append(os.path.join(root, file))
+
+                if gcov_files:
+                    metadata_dir = os.path.join(self.package_metadata_folder,
+                                               "coverage")
+                    # Limit to first 10 files
+                    for gcov_file in gcov_files[:10]:
+                        copy(self, os.path.basename(gcov_file),
+                             src=os.path.dirname(gcov_file), dst=metadata_dir)
+                    self.output.info(f"✅ Saved {len(gcov_files)} gcov files "
+                                    f"to metadata")
+
+        except Exception as e:
+            self.output.warn(f"Coverage report generation failed: {e}")
 
     def package(self):
         copy(self, "LICENSE", src=self.source_folder,

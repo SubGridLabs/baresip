@@ -35,6 +35,7 @@ jobs:
           - bb_macos_15_5_armv8_release_apple-clang_17_0
         config:
           - { preset: "default", opts: "-o 'baresip/*:with_sdl=True' -o 'baresip/*:with_pipewire=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=False' -o 'baresip/*:with_ffmpeg=False' -o 'baresip/*:with_vpx=False' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
+          - { preset: "coverage", opts: "-o 'baresip/*:with_coverage=True' -o 'baresip/*:with_sdl=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=False' -o 'baresip/*:with_ffmpeg=False' -o 'baresip/*:with_vpx=False' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
 
     steps:
     - name: Checkout
@@ -49,6 +50,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install "conan>=2.0"
+        
+    - name: Install coverage tools
+      if: matrix.config.preset == 'coverage'
+      run: |
+        pip install gcovr==5.0
+        echo "Coverage tools installed for coverage build"
 
     - name: Setup Conan
       run: |
@@ -103,7 +110,14 @@ jobs:
           # Upload baresip package (get version from conan cache)
           BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
           echo "📦 Uploading baresip version: ${BARESIP_VERSION}"
-          conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm
+          
+          # Upload package with metadata for coverage builds
+          if [[ "${{ matrix.config.preset }}" == "coverage" ]]; then
+            echo "📊 Uploading package with coverage metadata..."
+            conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm --metadata="*"
+          else
+            conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm
+          fi
           
           # Upload any other packages that might have been built
           conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do
@@ -123,3 +137,7 @@ jobs:
         echo "✅ Build and upload completed successfully!"
         BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
         echo "📦 Built and uploaded baresip version: ${BARESIP_VERSION}"
+        
+        if [[ "${{ matrix.config.preset }}" == "coverage" ]]; then
+          echo "📊 Coverage analysis enabled - check package metadata for reports"
+        fi

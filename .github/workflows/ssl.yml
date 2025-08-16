@@ -9,8 +9,27 @@ on:
     - main
 
 jobs:
+  # Check if this is a Conan integration (skip legacy build if so)
+  check-conan:
+    runs-on: ubuntu-latest
+    outputs:
+      skip-legacy: ${{ steps.check.outputs.skip-legacy }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: check
+      run: |
+        if [[ -f "conanfile.py" ]]; then
+          echo "skip-legacy=true" >> $GITHUB_OUTPUT
+          echo "🚀 Conan integration detected - skipping SSL tests"
+        else
+          echo "skip-legacy=false" >> $GITHUB_OUTPUT
+          echo "📦 No Conan integration - running SSL tests"
+        fi
+
   ssl:
     runs-on: ubuntu-latest 
+    needs: check-conan
+    if: needs.check-conan.outputs.skip-legacy != 'true'
 
     strategy:
       matrix:

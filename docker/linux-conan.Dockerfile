@@ -88,7 +88,12 @@ RUN apt-get update -y && \
         autotools-dev \
         pkg-config \
         bison \
-        flex && \
+        flex \
+        libva-dev \
+        libva-drm2 \
+        libva-x11-2 \
+        libva-wayland2 \
+        va-driver-all && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100 && \
     rm -rf /var/lib/apt/lists/*

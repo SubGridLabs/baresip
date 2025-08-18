@@ -103,16 +103,17 @@ jobs:
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
         # MUST use the specified bb_macos profile (no fallback to default!)
-        echo "🔍 Checking if profile ${{ matrix.profile }} exists..."
+        echo "🔍 Verifying profile ${{ matrix.profile }} exists..."
         
-        # Check if profile exists in list (ignore bbconanconfig stderr errors)
-        if conan profile list 2>/dev/null | grep -q "${{ matrix.profile }}"; then
+        if conan profile show ${{ matrix.profile }} >/dev/null 2>&1; then
           echo "✅ Using profile: ${{ matrix.profile }}"
+          echo "📋 Profile details:"
+          conan profile show ${{ matrix.profile }}
           PROFILE_ARG="-pr:h ${{ matrix.profile }} -pr:b ${{ matrix.profile }}"
         else
           echo "❌ Profile ${{ matrix.profile }} not found - CANNOT PROCEED!"
           echo "📋 Available profiles:"
-          conan profile list 2>/dev/null | grep "bb_macos" || echo "No bb_macos profiles found"
+          conan profile list | grep "bb_macos" || echo "No bb_macos profiles found"
           echo "💥 Build MUST use bb_macos profile (no default fallback allowed)"
           exit 1
         fi
@@ -339,13 +340,15 @@ jobs:
         echo "📋 Using profile: ${BUILD_PROFILE}"
         echo "🔧 Using options: ${BUILD_OPTIONS}"
         
-        # Verify the profile exists in test job (ignore bbconanconfig stderr errors)
-        if conan profile list 2>/dev/null | grep -q "${BUILD_PROFILE}"; then
+        # Verify the profile exists in test job
+        if conan profile show "${BUILD_PROFILE}" >/dev/null 2>&1; then
           echo "✅ Profile ${BUILD_PROFILE} found in test job"
+          echo "📋 Profile details:"
+          conan profile show "${BUILD_PROFILE}"
         else
           echo "❌ Profile ${BUILD_PROFILE} not found in test job!"
           echo "📋 Available profiles:"
-          conan profile list 2>/dev/null | grep "bb_macos" || echo "No bb_macos profiles found"
+          conan profile list | grep "bb_macos" || echo "No bb_macos profiles found"
           exit 1
         fi
         

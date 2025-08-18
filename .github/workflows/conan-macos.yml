@@ -366,7 +366,8 @@ jobs:
         mkdir -p baresip_test_deploy
         
         # Use exact same profile and options as build job
-        conan install --requires="baresip/${BARESIP_VERSION}" \
+        echo "🧪 Testing package availability - this verifies build job uploaded correctly"
+        if ! conan install --requires="baresip/${BARESIP_VERSION}" \
           --profile:host="${BUILD_PROFILE}" \
           --profile:build="${BUILD_PROFILE}" \
           -o 'baresip/*:with_tests=True' \
@@ -382,7 +383,17 @@ jobs:
           -o 'baresip/*:with_pulseaudio=False' \
           -o 'ffmpeg/*:with_libx265=False' \
           -c 'tools.cmake.cmaketoolchain:generator=Unix Makefiles' \
-          -d full_deploy --deployer-folder=baresip_test_deploy
+          -d full_deploy --deployer-folder=baresip_test_deploy; then
+          echo "❌ PACKAGE DEPLOYMENT FAILED!"
+          echo "💡 This means the build job failed to upload packages properly to Artifactory"
+          echo "🔍 Missing packages indicate upload issues in the build phase"
+          echo "📋 This is actually a good test - it verifies the CI upload logic works"
+          echo ""
+          echo "🔍 Let's check what packages are actually available:"
+          conan list "baresip/${BARESIP_VERSION}:*" -r=test-conan --format=compact || echo "No baresip packages found"
+          conan list "ffmpeg/7.1.1:*" -r=test-conan --format=compact || echo "No ffmpeg packages found"
+          exit 1
+        fi
         
         # Download metadata separately to get the selftest binary
         echo "📥 Downloading test metadata (selftest binary)..."

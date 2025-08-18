@@ -30,6 +30,7 @@ jobs:
     runs-on: macos-14
     outputs:
       baresip-version: ${{ steps.get-version.outputs.version }}
+      baresip-package-ref: ${{ steps.get-version.outputs.package-ref }}
     
     strategy:
       matrix:
@@ -191,17 +192,33 @@ jobs:
           echo "🔐 Repository admin needs to add CONAN_USER and CONAN_PASSWORD secrets"
         fi
         
-    - name: Get baresip version
+    - name: Get baresip package reference  
       id: get-version
       run: |
-        # Suppress bbconanconfig stderr errors during version extraction
+        # Get the exact package reference with package ID for the test job
+        echo "🔍 Getting exact baresip package reference from cache..."
         BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact 2>/dev/null | grep "baresip/" | cut -d'/' -f2 | head -1)
         if [[ -z "$BARESIP_VERSION" ]]; then
           echo "❌ Failed to get baresip version from cache"
           exit 1
         fi
+        
+        # Get the package ID for the tests variant (with_tests=True)
+        FULL_OUTPUT=$(conan list "baresip/${BARESIP_VERSION}:*" --cache 2>/dev/null || true)
+        PACKAGE_ID=$(echo "$FULL_OUTPUT" | grep -A 20 "with_tests: True" | grep -E '^[[:space:]]*[a-f0-9]{40}[[:space:]]*$' | tr -d ' ' | head -1)
+        
+        if [[ -z "$PACKAGE_ID" ]]; then
+          echo "❌ Failed to get package ID for test variant"
+          echo "📋 Available packages:"
+          echo "$FULL_OUTPUT"
+          exit 1
+        fi
+        
+        FULL_PACKAGE_REF="baresip/${BARESIP_VERSION}:${PACKAGE_ID}"
         echo "version=${BARESIP_VERSION}" >> $GITHUB_OUTPUT
+        echo "package-ref=${FULL_PACKAGE_REF}" >> $GITHUB_OUTPUT
         echo "📦 Built baresip version: ${BARESIP_VERSION}"
+        echo "📦 Full package reference: ${FULL_PACKAGE_REF}"
         
     - name: ✅ Build completed successfully
       run: |
@@ -313,20 +330,19 @@ jobs:
           exit 1
         fi
         
-        # Use full_deploy to get complete application with all dependencies
-        # CRITICAL: Use the same profile as the build to match package IDs
-        echo "🚀 Deploying baresip test package with full_deploy using bb_macos profile..."
-        echo "📋 Using profile bb_macos_15_5_armv8_release_apple-clang_17_0 for EXACT package ID match"
+        # Use the exact package reference from build job (no profile matching needed!)
+        BARESIP_PACKAGE_REF="${{ needs.macos-build.outputs.baresip-package-ref }}"
+        echo "🚀 Deploying exact baresip package using direct package reference..."
+        echo "📦 Using exact package reference: ${BARESIP_PACKAGE_REF}"
         mkdir -p baresip_test_deploy
         
-        # Profile verification was done in previous step
+        # Download the specific package binary directly (no profile needed)
+        echo "📥 Downloading specific package binary..."
+        conan download "${BARESIP_PACKAGE_REF}" -r=test-conan
         
+        # Use conan install with the downloaded package
         conan install --requires="baresip/${BARESIP_VERSION}" \
-          -pr:h bb_macos_15_5_armv8_release_apple-clang_17_0 \
-          -pr:b bb_macos_15_5_armv8_release_apple-clang_17_0 \
-          -o="baresip/*:with_tests=True" \
-          -o="baresip/*:with_sdl=False" \
-          -o="baresip/*:with_pipewire=False" \
+          --requires-override="${BARESIP_PACKAGE_REF}" \
           -d full_deploy --deployer-folder=baresip_test_deploy
         
         # Download metadata separately to get the selftest binary

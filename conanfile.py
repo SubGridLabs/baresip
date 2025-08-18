@@ -333,14 +333,12 @@ class BaresipConan(ConanFile):
         cmake.configure()
         cmake.build()
 
-        # Save test binaries to metadata if tests are enabled
-        if self.options.with_tests:
-            self._save_test_binaries_to_metadata()
-
     def _save_test_binaries_to_metadata(self):
         """Save test binaries to package metadata for separate test stage"""
         try:
             self.output.info("Saving test binaries to metadata...")
+            self.output.info(
+                f"Package metadata folder: {self.package_metadata_folder}")
 
             # Find the test executable
             if self.settings.os == "Windows":
@@ -350,11 +348,15 @@ class BaresipConan(ConanFile):
 
             test_path = os.path.join(self.build_folder, "test",
                                      test_executable)
+            self.output.info(f"Looking for test binary at: {test_path}")
 
             if os.path.exists(test_path):
                 # Create tests metadata directory
                 tests_metadata_dir = os.path.join(self.package_metadata_folder,
                                                  "tests")
+                self.output.info(
+                    f"Creating metadata directory: {tests_metadata_dir}")
+                os.makedirs(tests_metadata_dir, exist_ok=True)
 
                 # Copy test executable to metadata
                 copy(self, test_executable,
@@ -383,16 +385,21 @@ class BaresipConan(ConanFile):
                                 "generate coverage")
 
             else:
-                self.output.warn(f"⚠️ Test executable not found: {test_path}")
+                self.output.warning(
+                    f"⚠️ Test executable not found: {test_path}")
 
         except Exception as e:
-            self.output.warn(f"Failed to save test binaries: {e}")
+            self.output.warning(f"Failed to save test binaries: {e}")
 
     def package(self):
         copy(self, "LICENSE", src=self.source_folder,
              dst=os.path.join(self.package_folder, "licenses"))
         cmake = CMake(self)
         cmake.install()
+
+        # Save test binaries to metadata if tests are enabled
+        if self.options.with_tests:
+            self._save_test_binaries_to_metadata()
 
     def package_info(self):
         # Add the bin directory to PATH so the baresip executable can be found

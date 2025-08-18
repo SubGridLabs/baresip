@@ -259,13 +259,17 @@ jobs:
         fi
         
         # CRITICAL: Use the same profile as the test build to match package IDs
-        echo "🎯 Using bb_macos_15_5_armv8_release_apple-clang_17_0 profile to match test build"
+        echo "🎯 Verifying bb_macos_15_5_armv8_release_apple-clang_17_0 profile is available..."
         if conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0 >/dev/null 2>&1; then
           echo "✅ Found bb_macos profile for testing"
+          echo "📋 Profile details:"
+          conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0
         else
-          echo "❌ bb_macos profile not found - package IDs won't match!"
-          echo "Available profiles:"
+          echo "❌ bb_macos profile not found - CANNOT PROCEED!"
+          echo "📋 Available profiles:"
           conan profile list
+          echo "💥 Test job MUST use same profile as build job to match package IDs"
+          exit 1
         fi
         
     - name: Deploy test package using full deployer
@@ -295,7 +299,13 @@ jobs:
         # Use full_deploy to get complete application with all dependencies
         # CRITICAL: Use the same profile as the build to match package IDs
         echo "🚀 Deploying baresip test package with full_deploy using bb_macos profile..."
+        echo "📋 Using profile bb_macos_15_5_armv8_release_apple-clang_17_0 for EXACT package ID match"
         mkdir -p baresip_test_deploy
+        
+        # Show the exact profile being used
+        echo "📋 Host profile being used for deployment:"
+        conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0
+        
         conan install --requires="baresip/${BARESIP_VERSION}" \
           -pr:h bb_macos_15_5_armv8_release_apple-clang_17_0 \
           -pr:b bb_macos_15_5_armv8_release_apple-clang_17_0 \

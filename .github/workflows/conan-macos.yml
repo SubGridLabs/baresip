@@ -36,7 +36,6 @@ jobs:
         profile: 
           - bb_macos_15_5_armv8_release_apple-clang_17_0
         config:
-          - { preset: "default", opts: "-o 'baresip/*:with_sdl=True' -o 'baresip/*:with_pipewire=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=False' -o 'baresip/*:with_ffmpeg=False' -o 'baresip/*:with_vpx=False' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
           - { preset: "tests", opts: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=False' -o 'baresip/*:with_ffmpeg=False' -o 'baresip/*:with_vpx=False' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
 
     steps:

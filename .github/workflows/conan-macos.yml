@@ -85,7 +85,7 @@ jobs:
         
         # Install bbconanconfig (MUST succeed after login)
         echo "🔧 Installing bbconanconfig from test-conan..."
-        if conan config install-pkg bbconanconfig/0.9.5; then
+        if conan config install-pkg bbconanconfig/0.9.6; then
           echo "✅ bbconanconfig installed successfully"
           echo "📋 Available profiles:"
           conan profile list
@@ -275,7 +275,7 @@ jobs:
         
         # Install bbconanconfig to get the exact same profile used in build
         echo "🔧 Installing bbconanconfig from test-conan..."
-        if conan config install-pkg bbconanconfig/0.9.5; then
+        if conan config install-pkg bbconanconfig/0.9.6; then
           echo "✅ bbconanconfig installed successfully"
           echo "📋 Available profiles:"
           conan profile list

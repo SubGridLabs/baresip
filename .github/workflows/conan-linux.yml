@@ -65,7 +65,7 @@ jobs:
             conan profile detect --force
             conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
             echo 'secure123' | conan remote login test-conan builder
-            conan config install-pkg bbconanconfig/0.9.5
+            conan config install-pkg bbconanconfig/0.9.6
             
             echo '🏗️ Building minimal baresip with all missing dependencies...'
             echo '📺 Using exact same configuration as successful local build!'

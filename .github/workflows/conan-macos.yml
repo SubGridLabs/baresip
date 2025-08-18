@@ -208,12 +208,9 @@ jobs:
         echo "📦 Downloading metadata for baresip version: ${BARESIP_VERSION}"
         
         # Use proper conan download with metadata (following Conan guidelines)
-        # We need to download the test package specifically, not just any package
-        echo "📥 Downloading both default and test packages to ensure we get test metadata..."
+        # We need to download the FULL package to get both binaries and metadata
+        echo "📥 Downloading complete baresip packages (binaries + metadata)..."
         conan download "baresip/${BARESIP_VERSION}" -r=test-conan
-        
-        echo "📥 Now downloading metadata for test packages..."
-        conan download "baresip/${BARESIP_VERSION}" --metadata="tests/*" -r=test-conan
         
     - name: Run tests from downloaded metadata
       run: |
@@ -313,12 +310,11 @@ jobs:
         echo "DYLD_LIBRARY_PATH: $DYLD_LIBRARY_PATH"
         
         echo "🏃 Running baresip tests..."
+        TEST_EXIT_CODE=0
         if "$TEST_BINARY" 2>&1 | tee test_output.log; then
-          echo "✅ Tests completed successfully!"
-          TEST_STATUS="PASSED"
+          TEST_EXIT_CODE=$?
         else
-          echo "⚠️  Some tests failed (exit code $?)"
-          TEST_STATUS="PARTIAL_FAILURE"
+          TEST_EXIT_CODE=$?
         fi
         
         # Count test results from output (fix the parsing)
@@ -330,6 +326,21 @@ jobs:
         TOTAL_TESTS=${TOTAL_TESTS:-0}
         PASSED_TESTS=${PASSED_TESTS:-0}
         FAILED_TESTS=$((TOTAL_TESTS - PASSED_TESTS))
+        
+        # Determine test status based on results
+        if [[ $TOTAL_TESTS -eq 0 ]]; then
+          echo "❌ No tests were executed - this is a failure!"
+          TEST_STATUS="FAILED"
+        elif [[ $FAILED_TESTS -eq 0 && $TEST_EXIT_CODE -eq 0 ]]; then
+          echo "✅ All $TOTAL_TESTS tests passed!"
+          TEST_STATUS="PASSED"
+        elif [[ $FAILED_TESTS -gt 0 ]]; then
+          echo "⚠️  $FAILED_TESTS out of $TOTAL_TESTS tests failed"
+          TEST_STATUS="PARTIAL_FAILURE"
+        else
+          echo "⚠️  Tests completed with exit code $TEST_EXIT_CODE"
+          TEST_STATUS="PARTIAL_FAILURE"
+        fi
         
         # Generate test results summary
         cat > test_results.json << EOF
@@ -363,3 +374,15 @@ jobs:
       run: |
         echo "✅ macOS package testing completed!"
         echo "📊 Check artifacts for detailed test results and logs"
+        
+        # Fail the job if tests failed
+        if [[ -f test_results.json ]]; then
+          TEST_STATUS=$(grep -o '"test_status":[^,]*' test_results.json | cut -d'"' -f4)
+          if [[ "$TEST_STATUS" == "FAILED" ]]; then
+            echo "❌ Tests failed - failing the CI job"
+            exit 1
+          elif [[ "$TEST_STATUS" == "PARTIAL_FAILURE" ]]; then
+            echo "⚠️ Some tests failed - failing the CI job"
+            exit 1
+          fi
+        fi

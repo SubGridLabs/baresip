@@ -30,7 +30,8 @@ jobs:
     runs-on: macos-14
     outputs:
       baresip-version: ${{ steps.get-version.outputs.version }}
-      baresip-package-ref: ${{ steps.get-version.outputs.package-ref }}
+      build-profile: ${{ steps.get-version.outputs.build-profile }}
+      build-options: ${{ steps.get-version.outputs.build-options }}
     
     strategy:
       matrix:
@@ -101,13 +102,16 @@ jobs:
         echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
-        # Check if the profile exists, fallback to default if not
+        # MUST use the specified bb_macos profile (no fallback to default!)
         if conan profile show ${{ matrix.profile }} >/dev/null 2>&1; then
           echo "✅ Using profile: ${{ matrix.profile }}"
           PROFILE_ARG="-pr:h ${{ matrix.profile }} -pr:b ${{ matrix.profile }}"
         else
-          echo "⚠️  Profile ${{ matrix.profile }} not found, using default"
-          PROFILE_ARG=""
+          echo "❌ Profile ${{ matrix.profile }} not found - CANNOT PROCEED!"
+          echo "📋 Available profiles:"
+          conan profile list
+          echo "💥 Build MUST use bb_macos profile (no default fallback allowed)"
+          exit 1
         fi
         
         # Split conan create into steps to capture built dependencies
@@ -192,33 +196,27 @@ jobs:
           echo "🔐 Repository admin needs to add CONAN_USER and CONAN_PASSWORD secrets"
         fi
         
-    - name: Get baresip package reference  
+    - name: Get build information for test job
       id: get-version
       run: |
-        # Get the exact package reference with package ID for the test job
-        echo "🔍 Getting exact baresip package reference from cache..."
+        # Get version and capture exact build settings for test job
         BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact 2>/dev/null | grep "baresip/" | cut -d'/' -f2 | head -1)
         if [[ -z "$BARESIP_VERSION" ]]; then
           echo "❌ Failed to get baresip version from cache"
           exit 1
         fi
         
-        # Get the package ID for the tests variant (with_tests=True)
-        FULL_OUTPUT=$(conan list "baresip/${BARESIP_VERSION}:*" --cache 2>/dev/null || true)
-        PACKAGE_ID=$(echo "$FULL_OUTPUT" | grep -A 20 "with_tests: True" | grep -E '^[[:space:]]*[a-f0-9]{40}[[:space:]]*$' | tr -d ' ' | head -1)
+        # Capture the exact profile and options used in this build
+        BUILD_PROFILE="${{ matrix.profile }}"
+        BUILD_OPTIONS="${{ matrix.config.opts }}"
         
-        if [[ -z "$PACKAGE_ID" ]]; then
-          echo "❌ Failed to get package ID for test variant"
-          echo "📋 Available packages:"
-          echo "$FULL_OUTPUT"
-          exit 1
-        fi
-        
-        FULL_PACKAGE_REF="baresip/${BARESIP_VERSION}:${PACKAGE_ID}"
         echo "version=${BARESIP_VERSION}" >> $GITHUB_OUTPUT
-        echo "package-ref=${FULL_PACKAGE_REF}" >> $GITHUB_OUTPUT
+        echo "build-profile=${BUILD_PROFILE}" >> $GITHUB_OUTPUT
+        echo "build-options=${BUILD_OPTIONS}" >> $GITHUB_OUTPUT
+        
         echo "📦 Built baresip version: ${BARESIP_VERSION}"
-        echo "📦 Full package reference: ${FULL_PACKAGE_REF}"
+        echo "📋 Build profile: ${BUILD_PROFILE}"
+        echo "🔧 Build options: ${BUILD_OPTIONS}"
         
     - name: ✅ Build completed successfully
       run: |
@@ -330,19 +328,29 @@ jobs:
           exit 1
         fi
         
-        # Use the exact package reference from build job (no profile matching needed!)
-        BARESIP_PACKAGE_REF="${{ needs.macos-build.outputs.baresip-package-ref }}"
-        echo "🚀 Deploying exact baresip package using direct package reference..."
-        echo "📦 Using exact package reference: ${BARESIP_PACKAGE_REF}"
+        # Use EXACT same profile and options as build job
+        BUILD_PROFILE="${{ needs.macos-build.outputs.build-profile }}"
+        BUILD_OPTIONS="${{ needs.macos-build.outputs.build-options }}"
+        
+        echo "🚀 Deploying baresip package using EXACT same build settings..."
+        echo "📋 Using profile: ${BUILD_PROFILE}"
+        echo "🔧 Using options: ${BUILD_OPTIONS}"
+        
+        # Verify the profile exists in test job
+        if ! conan profile show "${BUILD_PROFILE}" >/dev/null 2>&1; then
+          echo "❌ Profile ${BUILD_PROFILE} not found in test job!"
+          echo "📋 Available profiles:"
+          conan profile list
+          exit 1
+        fi
+        
         mkdir -p baresip_test_deploy
         
-        # Download the specific package binary directly (no profile needed)
-        echo "📥 Downloading specific package binary..."
-        conan download "${BARESIP_PACKAGE_REF}" -r=test-conan
-        
-        # Use conan install with the downloaded package
+        # Use exact same profile and options as build job
         conan install --requires="baresip/${BARESIP_VERSION}" \
-          --requires-override="${BARESIP_PACKAGE_REF}" \
+          -pr:h "${BUILD_PROFILE}" \
+          -pr:b "${BUILD_PROFILE}" \
+          ${BUILD_OPTIONS} \
           -d full_deploy --deployer-folder=baresip_test_deploy
         
         # Download metadata separately to get the selftest binary

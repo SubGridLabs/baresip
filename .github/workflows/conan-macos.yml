@@ -125,10 +125,14 @@ jobs:
           $PROFILE_ARG \
           ${{ matrix.config.opts }} \
           --build=missing \
-          | tee install_output.log
+          2>&1 | tee install_output.log
         
-        # Extract built packages from install output
+        # Extract built packages from install output (wait for install to complete)
         echo "🔍 Extracting built packages from install log..."
+        sleep 1  # Give tee time to flush
+        echo "🔍 Debug: Searching for 'Package.*created' pattern in log..."
+        grep "Package.*created" install_output.log || echo "No 'Package.*created' lines found"
+        echo "🔍 Processing packages for upload list..."
         grep "Package '.*' created" install_output.log | sed "s/.*Package '\\(.*\\)' created.*/\\1/" | sort | uniq > built_packages.txt || echo "No packages were built" > built_packages.txt
         echo "📋 Built packages:"
         cat built_packages.txt

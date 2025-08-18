@@ -144,7 +144,7 @@ jobs:
           ${{ matrix.config.opts }}
           
     - name: Upload packages to artifactory
-      if: success()
+      if: always()
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
@@ -152,33 +152,39 @@ jobs:
         if conan remote auth test-conan >/dev/null 2>&1; then
           echo "✅ Authenticated to test-conan, uploading packages..."
           
-          # Get baresip version
+          # Get baresip version (if available)
           BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact 2>/dev/null | grep "baresip/" | cut -d'/' -f2 | head -1)
-          if [[ -z "$BARESIP_VERSION" ]]; then
-            echo "❌ Failed to get baresip version from cache"
-            exit 1
+          if [[ -n "$BARESIP_VERSION" ]]; then
+            echo "📦 Found baresip version: ${BARESIP_VERSION}"
+          else
+            echo "⚠️ Baresip package not found in cache, but will still upload other built packages"
           fi
-          echo "📦 Found baresip version: ${BARESIP_VERSION}"
           
-          # Add baresip to the built packages list
-          echo "baresip/${BARESIP_VERSION}" >> built_packages.txt
+          # Add baresip to the built packages list (if found)
+          if [[ -n "$BARESIP_VERSION" ]]; then
+            echo "baresip/${BARESIP_VERSION}" >> built_packages.txt
+          fi
           
           echo "📋 All packages to upload:"
           cat built_packages.txt
           
-          # Upload baresip first (with metadata for test builds)
-          if [[ "${{ matrix.config.preset }}" == "tests" ]]; then
-            echo "🧪 Uploading baresip package with test binaries metadata..."
-            if ! conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm --metadata="*" 2>/dev/null; then
-              echo "❌ Failed to upload baresip package with metadata"
-              exit 1
+          # Upload baresip first (with metadata for test builds) if it exists
+          if [[ -n "$BARESIP_VERSION" ]]; then
+            if [[ "${{ matrix.config.preset }}" == "tests" ]]; then
+              echo "🧪 Uploading baresip package with test binaries metadata..."
+              if ! conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm --metadata="*" 2>/dev/null; then
+                echo "❌ Failed to upload baresip package with metadata"
+                exit 1
+              fi
+            else
+              echo "📦 Uploading baresip package..."
+              if ! conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm 2>/dev/null; then
+                echo "❌ Failed to upload baresip package"
+                exit 1
+              fi
             fi
           else
-            echo "📦 Uploading baresip package..."
-            if ! conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm 2>/dev/null; then
-              echo "❌ Failed to upload baresip package"
-              exit 1
-            fi
+            echo "⚠️ Skipping baresip upload - package not found in cache"
           fi
           
           # Upload other built dependencies

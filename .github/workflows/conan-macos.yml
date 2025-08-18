@@ -150,18 +150,11 @@ jobs:
           echo "🧪 Test binaries saved to package metadata - ready for separate test/coverage stage"
         fi
 
-  # Stage 2: Run tests and generate coverage (only for test builds)
-  test-and-coverage:
+  # Stage 2: Test macOS package (separate job/stage)
+  test-macos-package:
     needs: [check-conan, macos-build]
     if: needs.check-conan.outputs.skip-legacy == 'false'
     runs-on: macos-14
-    
-    strategy:
-      matrix:
-        profile: 
-          - bb_macos_15_5_armv8_release_apple-clang_17_0
-        config:
-          - { preset: "tests" }  # Only run for test builds
 
     steps:
     - name: Checkout
@@ -172,10 +165,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install test and coverage tools
+    - name: Install Conan
       run: |
         python -m pip install --upgrade pip
-        pip install "conan>=2.0" gcovr==5.0
+        pip install "conan>=2.0"
 
     - name: Setup Conan
       run: |
@@ -183,7 +176,6 @@ jobs:
         
         # Add test-conan remote with higher priority
         conan remote add test-conan http://13.61.152.119:9300 --force
-        conan remote add conancenter https://center.conan.io --force
         conan remote list
         
         # Login to test-conan (check if secrets are available)
@@ -198,90 +190,100 @@ jobs:
         # Install bbconanconfig (might fail if not authenticated)
         conan config install-pkg bbconanconfig/0.9.5 || echo "⚠️ Could not install bbconanconfig - missing authentication?"
         
-    - name: Download package with test binaries
+    - name: Download test binaries using proper metadata approach
       run: |
-        echo "📥 Downloading baresip package with test binaries..."
+        echo "📥 Downloading baresip package with test binaries using proper Conan metadata..."
         
-        # Get the latest test build version
-        BARESIP_VERSION=$(echo "${{ needs.macos-build.outputs.baresip-version }}" | head -1)
+        # Get the version from the build job
+        BARESIP_VERSION="${{ needs.macos-build.outputs.baresip-version }}"
         if [[ -z "$BARESIP_VERSION" ]]; then
-          # Fallback: search for latest version with tests
-          BARESIP_VERSION=$(conan list "baresip/*" -r=test-conan --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
-        fi
-        
-        echo "📦 Downloading baresip version: ${BARESIP_VERSION}"
-        
-        # Create a temporary consumer to download package with metadata
-        mkdir -p test_consumer
-        cd test_consumer
-        
-        cat > conanfile.txt << EOF
-        [requires]
-        baresip/${BARESIP_VERSION}
-        
-        [generators]
-        VirtualEnv
-        EOF
-        
-        # Install package and download metadata
-        conan install . --metadata="*" -r=test-conan
-        
-    - name: Run tests and generate coverage
-      run: |
-        cd test_consumer
-        echo "🧪 Running tests and generating coverage..."
-        
-        # Find downloaded metadata
-        METADATA_PATH=$(find . -name "tests" -type d | head -1)
-        if [[ -z "$METADATA_PATH" ]]; then
-          echo "❌ Test binaries not found in package metadata"
+          echo "❌ Could not get baresip version from build job"
           exit 1
         fi
         
-        echo "📁 Found test metadata: $METADATA_PATH"
+        echo "📦 Downloading metadata for baresip version: ${BARESIP_VERSION}"
         
-        # Check test info
-        if [[ -f "$METADATA_PATH/test_info.json" ]]; then
-          echo "📋 Test info:"
-          cat "$METADATA_PATH/test_info.json"
+        # Use proper conan download with metadata (following Conan guidelines)
+        conan download "baresip/${BARESIP_VERSION}" --metadata="tests/*" -r=test-conan
+        
+    - name: Run tests from downloaded metadata
+      run: |
+        echo "🧪 Running tests from downloaded metadata..."
+        
+        # Get the metadata path using conan cache path command
+        BARESIP_VERSION="${{ needs.macos-build.outputs.baresip-version }}"
+        
+        # Find the package ID for the test build
+        PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | grep "baresip/${BARESIP_VERSION}:" | cut -d':' -f2 | head -1)
+        
+        if [[ -z "$PACKAGE_ID" ]]; then
+          echo "❌ Could not find package ID for baresip/${BARESIP_VERSION}"
+          exit 1
         fi
         
-        # Make test executable runnable
-        TEST_BINARY="$METADATA_PATH/selftest"
+        # Get the metadata folder path
+        METADATA_PATH=$(conan cache path "baresip/${BARESIP_VERSION}:${PACKAGE_ID}" --folder=metadata)
+        TEST_BINARY="${METADATA_PATH}/tests/selftest"
+        
+        if [[ ! -f "$TEST_BINARY" ]]; then
+          echo "❌ Test binary not found at: $TEST_BINARY"
+          exit 1
+        fi
+        
+        echo "📁 Found test binary: $TEST_BINARY"
+        
+        # Display test info
+        if [[ -f "${METADATA_PATH}/tests/test_info.json" ]]; then
+          echo "📋 Test build information:"
+          cat "${METADATA_PATH}/tests/test_info.json"
+        fi
+        
+        # Make executable and run tests
         chmod +x "$TEST_BINARY"
         
-        echo "🏃 Running tests..."
-        if "$TEST_BINARY"; then
-          echo "✅ All tests passed!"
+        echo "🏃 Running baresip tests..."
+        if "$TEST_BINARY" 2>&1 | tee test_output.log; then
+          echo "✅ Tests completed successfully!"
           TEST_STATUS="PASSED"
         else
-          echo "❌ Tests failed!"
-          TEST_STATUS="FAILED"
+          echo "⚠️  Some tests failed (exit code $?)"
+          TEST_STATUS="PARTIAL_FAILURE"
         fi
         
-        # Generate test results summary
-        TEST_RESULTS="{
-          \"test_status\": \"$TEST_STATUS\",
-          \"test_run_time\": \"$(date -Iseconds)\",
-          \"runner_os\": \"macos-14\",
-          \"runner_arch\": \"arm64\"
-        }"
+        # Count test results from output
+        TOTAL_TESTS=$(grep -c "RUN.*test_" test_output.log || echo "0")
+        PASSED_TESTS=$(grep -c "OK.*]$" test_output.log || echo "0")
+        FAILED_TESTS=$((TOTAL_TESTS - PASSED_TESTS))
         
-        echo "$TEST_RESULTS" > test_results.json
-        echo "📊 Test results:"
+        # Generate test results summary
+        cat > test_results.json << EOF
+        {
+          "test_status": "$TEST_STATUS",
+          "total_tests": $TOTAL_TESTS,
+          "passed_tests": $PASSED_TESTS,
+          "failed_tests": $FAILED_TESTS,
+          "test_run_time": "$(date -Iseconds)",
+          "runner_os": "macos-14",
+          "runner_arch": "arm64",
+          "baresip_version": "$BARESIP_VERSION",
+          "test_method": "conan_metadata_download",
+          "package_id": "$PACKAGE_ID"
+        }
+        EOF
+        
+        echo "📊 Test Results Summary:"
         cat test_results.json
         
-        # For now, we'll save results as artifacts
-        # In future, we could upload back to package metadata
-        
-    - name: Upload test results
+    - name: Upload test results and logs
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ matrix.config.preset }}
-        path: test_consumer/test_results.json
+        name: macos-test-results
+        path: |
+          test_results.json
+          test_output.log
         
-    - name: ✅ Test stage completed
+    - name: ✅ macOS Package Testing Complete
       run: |
-        echo "✅ Test and coverage stage completed!"
-        echo "📊 Check artifacts for test results"
+        echo "✅ macOS package testing completed!"
+        echo "📊 Check artifacts for detailed test results and logs"

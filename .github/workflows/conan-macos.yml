@@ -456,7 +456,7 @@ jobs:
         
         # Find libbaresip dylib in the deployed structure (generic pattern for any version)
         echo "🔧 Setting up library paths..."
-        BARESIP_DYLIB=$(find baresip_test_deploy -name "libbaresip.*.dylib" -type f | grep -E "libbaresip\.[0-9]+\.dylib$" | head -1)
+        BARESIP_DYLIB=$(find baresip_test_deploy -name "libbaresip.*.dylib" -type f | head -1)
         
         if [[ -n "$BARESIP_DYLIB" ]]; then
           BARESIP_LIB_DIR=$(dirname "$BARESIP_DYLIB")

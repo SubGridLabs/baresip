@@ -54,6 +54,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install "conan>=2.0"
         
+    - name: Cache Conan packages
+      uses: actions/cache@v4
+      with:
+        path: /tmp/conan-home-build
+        key: conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-macos.yml') }}
+        restore-keys: |
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-
+        
     - name: Install test tools
       if: matrix.config.preset == 'tests'
       run: |
@@ -262,6 +272,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install "conan>=2.0"
+        
+    - name: Cache Conan packages (test)
+      uses: actions/cache@v4
+      with:
+        path: /tmp/conan-home-test
+        key: conan-test-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-macos.yml') }}
+        restore-keys: |
+          conan-test-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-test-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Setup Conan
       run: |

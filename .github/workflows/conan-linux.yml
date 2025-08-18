@@ -39,6 +39,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      
+    - name: Cache Conan packages (Docker)
+      uses: actions/cache@v4
+      with:
+        path: /tmp/conan-cache-linux
+        key: conan-linux-${{ runner.os }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-linux.yml') }}
+        restore-keys: |
+          conan-linux-${{ runner.os }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-linux-${{ runner.os }}-${{ matrix.profile }}-
+          conan-linux-${{ runner.os }}-
 
     - name: Build Docker image
       run: |
@@ -50,9 +60,13 @@ jobs:
         echo "🔨 Building baresip with profile: ${{ matrix.profile }}"
         echo "📋 Configuration: ${{ matrix.config.preset }}"
         
-        # Run build in Docker container with internal cache (exactly like successful local build)
+        # Create cache directory on host
+        mkdir -p /tmp/conan-cache-linux
+        
+        # Run build in Docker container with mounted cache (persistent across builds)
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
+          -v "/tmp/conan-cache-linux:/tmp/conan-home" \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
           -e CONAN_HOME=/tmp/conan-home \
@@ -90,9 +104,10 @@ jobs:
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
-        # Run upload in Docker container with internal cache (same as successful local build)
+        # Run upload in Docker container with mounted cache (same as build step)
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
+          -v "/tmp/conan-cache-linux:/tmp/conan-home" \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
           -e CONAN_HOME=/tmp/conan-home \

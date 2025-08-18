@@ -218,29 +218,20 @@ jobs:
           exit 1
         fi
         
-        # Create a temporary conanfile.txt for deployment with test-enabled variant
-        echo "📝 Creating conanfile.txt for test package deployment..."
-        cat > conanfile_test_deploy.txt << EOF
-        [requires]
-        baresip/${BARESIP_VERSION}
-        
-        [options]
-        baresip/*:with_tests=True
-        baresip/*:with_sdl=False
-        baresip/*:with_pipewire=False
-        
-        [generators]
-        
-        [tool_requires]
-        EOF
-        
         # Use full_deploy to get complete application with all dependencies
         echo "🚀 Deploying baresip test package with full_deploy..."
         mkdir -p baresip_test_deploy
-        conan install conanfile_test_deploy.txt -d full_deploy --deployer-folder=baresip_test_deploy
+        conan install --requires="baresip/${BARESIP_VERSION}" -o="baresip/*:with_tests=True" -o="baresip/*:with_sdl=False" -o="baresip/*:with_pipewire=False" -d full_deploy --deployer-folder=baresip_test_deploy
         
-        echo "✅ Deployment complete - checking deployed structure..."
-        find baresip_test_deploy -name "*.dylib" -o -name "selftest" | head -20
+        # Download metadata separately to get the selftest binary
+        echo "📥 Downloading test metadata (selftest binary)..."
+        conan download "baresip/${BARESIP_VERSION}" --metadata="tests/*" -r=test-conan
+        
+        echo "✅ Deployment complete - checking deployed structure and metadata..."
+        echo "📁 Deployed binaries and libraries:"
+        find baresip_test_deploy -name "*.dylib" | head -10
+        echo "📁 Downloaded test metadata:"
+        find ~/.conan2 -name "selftest" -type f 2>/dev/null | head -5
         
     - name: Run tests from deployed package
       run: |
@@ -249,14 +240,14 @@ jobs:
         # Get the version for reference
         BARESIP_VERSION="${{ needs.macos-build.outputs.baresip-version }}"
         
-        # Find the selftest binary in the deployed structure
-        echo "🔍 Looking for selftest binary in deployed package..."
-        TEST_BINARY=$(find baresip_test_deploy -name "selftest" -type f | head -1)
+        # Find the selftest binary from the downloaded metadata
+        echo "🔍 Looking for selftest binary in downloaded metadata..."
+        TEST_BINARY=$(find ~/.conan2 -name "selftest" -path "*/metadata/tests/selftest" -type f | head -1)
         
         if [[ -z "$TEST_BINARY" ]]; then
-          echo "❌ Test binary not found in deployed package"
-          echo "📁 Deployed structure:"
-          find baresip_test_deploy -type f | head -20
+          echo "❌ Test binary not found in metadata"
+          echo "📁 Available metadata files:"
+          find ~/.conan2 -path "*/metadata/tests/*" -type f 2>/dev/null | head -10
           exit 1
         fi
         

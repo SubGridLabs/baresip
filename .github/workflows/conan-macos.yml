@@ -404,7 +404,7 @@ jobs:
         echo "📁 Deployed binaries and libraries:"
         find baresip_test_deploy -name "*.dylib" | head -10
         echo "📁 Using conan cache path to find metadata location..."
-        PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | grep -o ":[a-f0-9]*" | sed 's/://')
+        PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://')
         echo "📦 Package ID: ${PACKAGE_ID}"
         
     - name: Run tests from deployed package
@@ -416,7 +416,7 @@ jobs:
         BUILD_PROFILE="${{ needs.macos-build.outputs.build-profile }}"
         
         # Get package ID dynamically
-        PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | grep -o ":[a-f0-9]*" | sed 's/://')
+        PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://')
         echo "📦 Using Package ID: ${PACKAGE_ID}"
         
         # Get metadata path using conan cache path

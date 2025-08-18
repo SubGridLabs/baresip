@@ -273,19 +273,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install "conan>=2.0"
         
-    - name: Cache Conan packages (test)
+    - name: Cache Conan packages (shared)
       uses: actions/cache@v4
       with:
-        path: /tmp/conan-home-test
-        key: conan-test-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-macos.yml') }}
+        path: /tmp/conan-home-build
+        key: conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-macos.yml') }}
         restore-keys: |
-          conan-test-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
-          conan-test-${{ runner.os }}-${{ runner.arch }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Setup Conan
       run: |
-        # Set consistent CONAN_HOME for test job
-        export CONAN_HOME=/tmp/conan-home-test
+        # Use same CONAN_HOME as build job to share cache
+        export CONAN_HOME=/tmp/conan-home-build
         mkdir -p $CONAN_HOME
         echo "CONAN_HOME=$CONAN_HOME" >> $GITHUB_ENV
         

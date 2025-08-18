@@ -68,3 +68,4 @@ install_manifest.txt
 
 # Visual Studio Code
 .vscode/*
+ci_test_deploy/

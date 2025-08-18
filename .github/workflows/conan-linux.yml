@@ -34,7 +34,7 @@ jobs:
         profile: 
           - bb_linux_ubuntu_24_10_x86_64_release_clang_19
         config:
-          - { preset: "default", opts: "-o 'baresip/*:with_sdl=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_sndfile=False' -o 'baresip/*:with_av1=False' -o 'baresip/*:with_ffmpeg=False' -o 'baresip/*:with_vpx=False' -o 'baresip/*:with_pulseaudio=False' -o 'baresip/*:with_mpg123=False'" }
+          - { preset: "default", opts: "-o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False'" }
 
     steps:
     - name: Checkout

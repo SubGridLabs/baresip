@@ -363,9 +363,21 @@ jobs:
         
         # Use exact same profile and options as build job
         conan install --requires="baresip/${BARESIP_VERSION}" \
-          -pr:h "${BUILD_PROFILE}" \
-          -pr:b "${BUILD_PROFILE}" \
-          ${BUILD_OPTIONS} \
+          --profile:host="${BUILD_PROFILE}" \
+          --profile:build="${BUILD_PROFILE}" \
+          -o 'baresip/*:with_tests=True' \
+          -o 'baresip/*:with_sdl=True' \
+          -o 'baresip/*:with_av1=True' \
+          -o 'baresip/*:with_ffmpeg=True' \
+          -o 'baresip/*:with_vpx=True' \
+          -o 'baresip/*:with_sndfile=True' \
+          -o 'baresip/*:with_mpg123=True' \
+          -o 'baresip/*:with_pipewire=False' \
+          -o 'baresip/*:with_gstreamer=False' \
+          -o 'baresip/*:with_gtk=False' \
+          -o 'baresip/*:with_pulseaudio=False' \
+          -o 'ffmpeg/*:with_libx265=False' \
+          -c 'tools.cmake.cmaketoolchain:generator=Unix Makefiles' \
           -d full_deploy --deployer-folder=baresip_test_deploy
         
         # Download metadata separately to get the selftest binary

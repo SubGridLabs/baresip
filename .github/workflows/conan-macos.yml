@@ -104,11 +104,29 @@ jobs:
           PROFILE_ARG=""
         fi
         
-        # The version is now dynamically generated in conanfile.py
-        conan create . \
+        # Split conan create into steps to capture built dependencies
+        echo "📥 Step 1: Installing dependencies with --build=missing..."
+        conan install . \
           $PROFILE_ARG \
           ${{ matrix.config.opts }} \
-          --build=missing
+          --build=missing \
+          | tee install_output.log
+        
+        # Extract built packages from install output
+        echo "🔍 Extracting built packages from install log..."
+        grep "Package '.*' created" install_output.log | sed "s/.*Package '\\(.*\\)' created.*/\\1/" | sort | uniq > built_packages.txt || echo "No packages were built" > built_packages.txt
+        echo "📋 Built packages:"
+        cat built_packages.txt
+        
+        echo "🔨 Step 2: Building baresip..."
+        conan build . \
+          $PROFILE_ARG \
+          ${{ matrix.config.opts }}
+        
+        echo "📦 Step 3: Creating baresip package..."
+        conan export-pkg . \
+          $PROFILE_ARG \
+          ${{ matrix.config.opts }}
           
     - name: Upload packages to artifactory
       if: success()
@@ -119,25 +137,49 @@ jobs:
         if conan remote auth test-conan >/dev/null 2>&1; then
           echo "✅ Authenticated to test-conan, uploading packages..."
           
-          # Upload baresip package (get version from conan cache)
-          BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
-          echo "📦 Uploading baresip version: ${BARESIP_VERSION}"
+          # Get baresip version
+          BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact 2>/dev/null | grep "baresip/" | cut -d'/' -f2 | head -1)
+          if [[ -z "$BARESIP_VERSION" ]]; then
+            echo "❌ Failed to get baresip version from cache"
+            exit 1
+          fi
+          echo "📦 Found baresip version: ${BARESIP_VERSION}"
           
-          # Upload package with metadata for test builds
+          # Add baresip to the built packages list
+          echo "baresip/${BARESIP_VERSION}" >> built_packages.txt
+          
+          echo "📋 All packages to upload:"
+          cat built_packages.txt
+          
+          # Upload baresip first (with metadata for test builds)
           if [[ "${{ matrix.config.preset }}" == "tests" ]]; then
-            echo "🧪 Uploading package with test binaries metadata..."
-            conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm --metadata="*"
+            echo "🧪 Uploading baresip package with test binaries metadata..."
+            if ! conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm --metadata="*" 2>/dev/null; then
+              echo "❌ Failed to upload baresip package with metadata"
+              exit 1
+            fi
           else
-            conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm
+            echo "📦 Uploading baresip package..."
+            if ! conan upload "baresip/${BARESIP_VERSION}" -r=test-conan --confirm 2>/dev/null; then
+              echo "❌ Failed to upload baresip package"
+              exit 1
+            fi
           fi
           
-          # Upload any other packages that might have been built
-          conan list "*" --cache | grep -E "^[a-zA-Z]" | while read package; do
-            if [[ "$package" != "baresip"* ]]; then
-              echo "📦 Checking if $package was built and needs upload..."
-              conan upload "$package" -r=test-conan --confirm || true
+          # Upload other built dependencies
+          while read package_ref; do
+            # Skip empty lines and baresip (already uploaded with metadata)
+            if [[ -n "$package_ref" ]] && [[ "$package_ref" != "baresip/"* ]] && [[ "$package_ref" != "No packages were built" ]]; then
+              echo "📦 Uploading dependency: $package_ref"
+              if ! conan upload "$package_ref" -r=test-conan --confirm 2>/dev/null; then
+                echo "⚠️ Failed to upload $package_ref (might already exist)"
+              else
+                echo "✅ Uploaded $package_ref"
+              fi
             fi
-          done
+          done < built_packages.txt
+          
+          echo "✅ Upload process completed"
         else
           echo "⚠️  Not authenticated to test-conan remote"
           echo "💡 Skipping upload - packages built successfully but not uploaded"
@@ -147,7 +189,12 @@ jobs:
     - name: Get baresip version
       id: get-version
       run: |
-        BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact | grep "baresip/" | cut -d'/' -f2 | head -1)
+        # Suppress bbconanconfig stderr errors during version extraction
+        BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact 2>/dev/null | grep "baresip/" | cut -d'/' -f2 | head -1)
+        if [[ -z "$BARESIP_VERSION" ]]; then
+          echo "❌ Failed to get baresip version from cache"
+          exit 1
+        fi
         echo "version=${BARESIP_VERSION}" >> $GITHUB_OUTPUT
         echo "📦 Built baresip version: ${BARESIP_VERSION}"
         

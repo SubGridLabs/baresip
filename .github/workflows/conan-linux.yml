@@ -34,7 +34,7 @@ jobs:
         profile: 
           - bb_linux_ubuntu_24_10_x86_64_release_clang_19
         config:
-          - { preset: "default", opts: "-o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False'" }
+          - { preset: "default", opts: "-o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False'" }
 
     steps:
     - name: Checkout
@@ -71,11 +71,22 @@ jobs:
             echo '📺 Using exact same configuration as successful local build!'
             conan create . \
               ${{ matrix.config.opts }} \
-              --build=missing
+              --build=missing 2>&1 | tee install_output.log
+            
+            echo '🔍 Extracting built packages from install log...'
+            # Wait for output to be fully written
+            sync && sleep 2
+            echo '🔍 Debug: Searching for package creation patterns...'
+            grep -E '(Package .* created|Created package)' install_output.log || echo 'No packages created'
+            # Extract package references (name/version) from creation messages
+            # Lines look like: 'ffmpeg/7.1.1: Package abc123... created'
+            grep -E 'Package .* created' install_output.log | sed \"s/^\\([^:]*\\):.*Package .* created.*/\\1/\" | sort | uniq > built_packages.txt || echo 'No packages were built' > built_packages.txt
+            echo '📋 Built packages:'
+            cat built_packages.txt
           "
           
     - name: Upload packages to artifactory
-      if: success()
+      if: always()
       run: |
         echo "📤 Uploading built packages to test-conan remote..."
         
@@ -92,11 +103,26 @@ jobs:
             conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
             echo 'secure123' | conan remote login test-conan builder
             
-            echo '📦 Listing all packages to upload:'
-            conan list '*' --cache
-            
-            echo '📤 Uploading packages to artifactory...'
-            conan upload '*' -r=test-conan --confirm || echo '⚠️ Some packages may already exist'
+            # Read the built packages list
+            if [[ -f built_packages.txt ]]; then
+              echo '📋 Packages detected as built:'
+              cat built_packages.txt
+              
+              if [[ -s built_packages.txt ]]; then
+                echo '📤 Uploading detected packages...'
+                while IFS= read -r package; do
+                  if [[ -n \"\$package\" && \"\$package\" != 'No packages were built' ]]; then
+                    echo \"📦 Uploading: \$package\"
+                    conan upload \"\$package\" -r=test-conan --confirm || echo \"⚠️ \$package upload failed or already exists\"
+                  fi
+                done < built_packages.txt
+              else
+                echo '⚠️ No packages were built to upload'
+              fi
+            else
+              echo '⚠️ built_packages.txt not found, uploading all packages as fallback'
+              conan upload '*' -r=test-conan --confirm || echo '⚠️ Some packages may already exist'
+            fi
             
             echo '✅ Upload completed!'
           "

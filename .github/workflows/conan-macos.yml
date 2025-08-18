@@ -227,20 +227,38 @@ jobs:
         conan list "baresip/${BARESIP_VERSION}:*" --cache
         
         # We need to find the package ID that has with_tests=True
-        # Unfortunately, conan list doesn't filter by options, so we'll try both package IDs
-        ALL_PACKAGE_IDS=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | grep "baresip/${BARESIP_VERSION}:" | cut -d':' -f2)
+        # Parse the conan list output to extract package IDs dynamically
+        echo "📋 Parsing package IDs from conan list output..."
+        
+        # Extract package IDs from the output (they appear as 40-character hex strings)
+        # We'll redirect stderr to ignore the bbconanconfig errors but keep stdout
+        CONAN_OUTPUT=$(conan list "baresip/${BARESIP_VERSION}:*" --cache 2>/dev/null || true)
+        ALL_PACKAGE_IDS=$(echo "$CONAN_OUTPUT" | grep -E '^[[:space:]]*[a-f0-9]{40}[[:space:]]*$' | tr -d ' ')
+        
+        if [[ -z "$ALL_PACKAGE_IDS" ]]; then
+          echo "⚠️ Could not extract package IDs from conan list output"
+          echo "📋 Full output was:"
+          echo "$CONAN_OUTPUT"
+          echo "❌ No package IDs found"
+          exit 1
+        fi
+        
+        echo "📦 Found package IDs: $ALL_PACKAGE_IDS"
         
         PACKAGE_ID=""
         for pkg_id in $ALL_PACKAGE_IDS; do
           echo "🔍 Checking package ID: $pkg_id"
-          # Check if this package has test metadata
-          METADATA_PATH_TEST=$(conan cache path "baresip/${BARESIP_VERSION}:${pkg_id}" --folder=metadata)
-          if [[ -f "${METADATA_PATH_TEST}/tests/selftest" ]]; then
-            echo "✅ Found package with test binaries: $pkg_id"
-            PACKAGE_ID="$pkg_id"
-            break
+          # Check if this package has test metadata using conan cache path
+          if METADATA_PATH_TEST=$(conan cache path "baresip/${BARESIP_VERSION}:${pkg_id}" --folder=metadata 2>/dev/null); then
+            if [[ -f "${METADATA_PATH_TEST}/tests/selftest" ]]; then
+              echo "✅ Found package with test binaries: $pkg_id"
+              PACKAGE_ID="$pkg_id"
+              break
+            else
+              echo "❌ Package $pkg_id does not have test binaries"
+            fi
           else
-            echo "❌ Package $pkg_id does not have test binaries"
+            echo "❌ Package $pkg_id not found in cache"
           fi
         done
         

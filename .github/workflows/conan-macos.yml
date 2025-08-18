@@ -453,16 +453,16 @@ jobs:
         echo "✅ Found test binary: $TEST_BINARY"
         chmod +x "$TEST_BINARY"
         
-        # Find libbaresip.20.dylib in the deployed structure (generic path)
+        # Find libbaresip dylib in the deployed structure (generic pattern for any version)
         echo "🔧 Setting up library paths..."
-        BARESIP_DYLIB=$(find baresip_test_deploy -name "libbaresip.20.dylib" -type f | head -1)
+        BARESIP_DYLIB=$(find baresip_test_deploy -name "libbaresip.*.dylib" -type f | grep -E "libbaresip\.[0-9]+\.dylib$" | head -1)
         
         if [[ -n "$BARESIP_DYLIB" ]]; then
           BARESIP_LIB_DIR=$(dirname "$BARESIP_DYLIB")
-          echo "✅ Found libbaresip.20.dylib at: $BARESIP_DYLIB"
+          echo "✅ Found baresip dylib at: $BARESIP_DYLIB"
           export DYLD_LIBRARY_PATH="${BARESIP_LIB_DIR}:$DYLD_LIBRARY_PATH"
         else
-          echo "❌ libbaresip.20.dylib not found in deployed package"
+          echo "❌ libbaresip dylib not found in deployed package"
           echo "📁 Available baresip dylib files:"
           find baresip_test_deploy -name "*baresip*.dylib" -type f
           exit 1

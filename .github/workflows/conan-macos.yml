@@ -213,8 +213,27 @@ jobs:
         # Get the metadata path using conan cache path command
         BARESIP_VERSION="${{ needs.macos-build.outputs.baresip-version }}"
         
-        # Find the package ID for the test build
-        PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | grep "baresip/${BARESIP_VERSION}:" | cut -d':' -f2 | head -1)
+        # Find the package ID for the test build (with_tests=True)
+        echo "Looking for package with tests enabled..."
+        conan list "baresip/${BARESIP_VERSION}:*" --cache
+        
+        # We need to find the package ID that has with_tests=True
+        # Unfortunately, conan list doesn't filter by options, so we'll try both package IDs
+        ALL_PACKAGE_IDS=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | grep "baresip/${BARESIP_VERSION}:" | cut -d':' -f2)
+        
+        PACKAGE_ID=""
+        for pkg_id in $ALL_PACKAGE_IDS; do
+          echo "🔍 Checking package ID: $pkg_id"
+          # Check if this package has test metadata
+          METADATA_PATH_TEST=$(conan cache path "baresip/${BARESIP_VERSION}:${pkg_id}" --folder=metadata)
+          if [[ -f "${METADATA_PATH_TEST}/tests/selftest" ]]; then
+            echo "✅ Found package with test binaries: $pkg_id"
+            PACKAGE_ID="$pkg_id"
+            break
+          else
+            echo "❌ Package $pkg_id does not have test binaries"
+          fi
+        done
         
         if [[ -z "$PACKAGE_ID" ]]; then
           echo "❌ Could not find package ID for baresip/${BARESIP_VERSION}"

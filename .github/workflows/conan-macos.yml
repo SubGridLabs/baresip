@@ -150,7 +150,7 @@ jobs:
           echo "🧪 Test binaries saved to package metadata - ready for separate test/coverage stage"
         fi
 
-  # Stage 2: Test macOS package (separate job/stage)
+  # Stage 2: Test macOS package (separate job/stage)  
   test-macos-package:
     needs: [check-conan, macos-build]
     if: needs.check-conan.outputs.skip-legacy == 'false'
@@ -205,7 +205,18 @@ jobs:
           exit 1
         fi
         
-        echo "📦 Downloading metadata for baresip version: ${BARESIP_VERSION}"
+        echo "📦 Verifying baresip version ${BARESIP_VERSION} exists on remote..."
+        
+        # First verify the package exists on the remote before downloading
+        echo "🔍 Checking if package exists on test-conan remote..."
+        if conan list "baresip/${BARESIP_VERSION}" -r=test-conan 2>/dev/null; then
+          echo "✅ Package found on remote"
+        else
+          echo "❌ Package not found on remote - build may have failed or upload incomplete"
+          echo "📋 Available packages on remote:"
+          conan list "baresip/*" -r=test-conan || echo "No baresip packages found"
+          exit 1
+        fi
         
         # Use proper conan download with metadata (following Conan guidelines)
         # We need to download the FULL package to get both binaries and metadata

@@ -2,7 +2,7 @@ name: Conan Linux Build
 
 on:
   push:
-    branches: [ main, conan-integration ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 

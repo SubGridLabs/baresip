@@ -187,8 +187,12 @@ jobs:
           echo "💡 Repository admin needs to add these secrets for artifactory access"
         fi
         
-        # Install bbconanconfig (might fail if not authenticated)
-        conan config install-pkg bbconanconfig/0.9.5 || echo "⚠️ Could not install bbconanconfig - missing authentication?"
+        # Install bbconanconfig (might fail if not authenticated or has syntax errors)
+        echo "🔧 Installing bbconanconfig..."
+        if ! conan config install-pkg bbconanconfig/0.9.5; then
+          echo "⚠️ Could not install bbconanconfig - trying to continue without it"
+          echo "💡 This might affect profile detection but basic functionality should work"
+        fi
         
     - name: Download test binaries using proper metadata approach
       run: |
@@ -204,6 +208,11 @@ jobs:
         echo "📦 Downloading metadata for baresip version: ${BARESIP_VERSION}"
         
         # Use proper conan download with metadata (following Conan guidelines)
+        # We need to download the test package specifically, not just any package
+        echo "📥 Downloading both default and test packages to ensure we get test metadata..."
+        conan download "baresip/${BARESIP_VERSION}" -r=test-conan
+        
+        echo "📥 Now downloading metadata for test packages..."
         conan download "baresip/${BARESIP_VERSION}" --metadata="tests/*" -r=test-conan
         
     - name: Run tests from downloaded metadata

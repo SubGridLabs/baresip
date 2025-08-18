@@ -287,6 +287,31 @@ jobs:
         # Make executable and run tests
         chmod +x "$TEST_BINARY"
         
+        # Set up library paths for the test binary to find libbaresip
+        echo "🔧 Setting up library paths..."
+        
+        # Try to find the libbaresip.21.dylib in the package
+        PACKAGE_LIB_DIR="${METADATA_PATH%/metadata}/lib"
+        if [[ -f "${PACKAGE_LIB_DIR}/libbaresip.21.dylib" ]]; then
+          echo "✅ Found libbaresip.21.dylib in package lib directory"
+          export DYLD_LIBRARY_PATH="${PACKAGE_LIB_DIR}:$DYLD_LIBRARY_PATH"
+        else
+          echo "❌ libbaresip.21.dylib not found in package lib directory"
+          # Try to find it in the build directory
+          BUILD_LIB_DIR="${METADATA_PATH%/metadata/../..}/b/build/Release"
+          if [[ -f "${BUILD_LIB_DIR}/libbaresip.21.dylib" ]]; then
+            echo "✅ Found libbaresip.21.dylib in build directory"
+            export DYLD_LIBRARY_PATH="${BUILD_LIB_DIR}:$DYLD_LIBRARY_PATH"
+          else
+            echo "⚠️ libbaresip.21.dylib not found - test may fail"
+            echo "📁 Available files in package:"
+            find "${METADATA_PATH%/metadata}" -name "*.dylib" || echo "No dylib files found"
+          fi
+        fi
+        
+        echo "📚 Library paths:"
+        echo "DYLD_LIBRARY_PATH: $DYLD_LIBRARY_PATH"
+        
         echo "🏃 Running baresip tests..."
         if "$TEST_BINARY" 2>&1 | tee test_output.log; then
           echo "✅ Tests completed successfully!"
@@ -296,9 +321,14 @@ jobs:
           TEST_STATUS="PARTIAL_FAILURE"
         fi
         
-        # Count test results from output
-        TOTAL_TESTS=$(grep -c "RUN.*test_" test_output.log || echo "0")
-        PASSED_TESTS=$(grep -c "OK.*]$" test_output.log || echo "0")
+        # Count test results from output (fix the parsing)
+        TOTAL_TESTS=$(grep -c "RUN.*test_" test_output.log 2>/dev/null || echo "0")
+        PASSED_TESTS=$(grep -c "OK.*]$" test_output.log 2>/dev/null || echo "0")
+        # Ensure we have valid numbers
+        TOTAL_TESTS=${TOTAL_TESTS//[^0-9]/}
+        PASSED_TESTS=${PASSED_TESTS//[^0-9]/}
+        TOTAL_TESTS=${TOTAL_TESTS:-0}
+        PASSED_TESTS=${PASSED_TESTS:-0}
         FAILED_TESTS=$((TOTAL_TESTS - PASSED_TESTS))
         
         # Generate test results summary

@@ -187,11 +187,21 @@ jobs:
           echo "💡 Repository admin needs to add these secrets for artifactory access"
         fi
         
-        # Install bbconanconfig (might fail if not authenticated or has syntax errors)
+        # Install bbconanconfig to get the exact same profile used in build
         echo "🔧 Installing bbconanconfig..."
         if ! conan config install-pkg bbconanconfig/0.9.5; then
           echo "⚠️ Could not install bbconanconfig - trying to continue without it"
           echo "💡 This might affect profile detection but basic functionality should work"
+        fi
+        
+        # CRITICAL: Use the same profile as the test build to match package IDs
+        echo "🎯 Using bb_macos_15_5_armv8_release_apple-clang_17_0 profile to match test build"
+        if conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0 >/dev/null 2>&1; then
+          echo "✅ Found bb_macos profile for testing"
+        else
+          echo "❌ bb_macos profile not found - package IDs won't match!"
+          echo "Available profiles:"
+          conan profile list
         fi
         
     - name: Deploy test package using full deployer
@@ -219,9 +229,16 @@ jobs:
         fi
         
         # Use full_deploy to get complete application with all dependencies
-        echo "🚀 Deploying baresip test package with full_deploy..."
+        # CRITICAL: Use the same profile as the build to match package IDs
+        echo "🚀 Deploying baresip test package with full_deploy using bb_macos profile..."
         mkdir -p baresip_test_deploy
-        conan install --requires="baresip/${BARESIP_VERSION}" -o="baresip/*:with_tests=True" -o="baresip/*:with_sdl=False" -o="baresip/*:with_pipewire=False" -d full_deploy --deployer-folder=baresip_test_deploy
+        conan install --requires="baresip/${BARESIP_VERSION}" \
+          -pr:h bb_macos_15_5_armv8_release_apple-clang_17_0 \
+          -pr:b bb_macos_15_5_armv8_release_apple-clang_17_0 \
+          -o="baresip/*:with_tests=True" \
+          -o="baresip/*:with_sdl=False" \
+          -o="baresip/*:with_pipewire=False" \
+          -d full_deploy --deployer-folder=baresip_test_deploy
         
         # Download metadata separately to get the selftest binary
         echo "📥 Downloading test metadata (selftest binary)..."

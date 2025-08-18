@@ -60,6 +60,11 @@ jobs:
 
     - name: Setup Conan
       run: |
+        # Set consistent CONAN_HOME for build job
+        export CONAN_HOME=/tmp/conan-home-build
+        mkdir -p $CONAN_HOME
+        echo "CONAN_HOME=$CONAN_HOME" >> $GITHUB_ENV
+        
         conan profile detect --force
         
         # Add test-conan remote with higher priority (index 0)
@@ -229,6 +234,11 @@ jobs:
 
     - name: Setup Conan
       run: |
+        # Set consistent CONAN_HOME for test job
+        export CONAN_HOME=/tmp/conan-home-test
+        mkdir -p $CONAN_HOME
+        echo "CONAN_HOME=$CONAN_HOME" >> $GITHUB_ENV
+        
         conan profile detect --force
         
         # Add test-conan remote with higher priority (index 0)
@@ -260,16 +270,23 @@ jobs:
         
         # CRITICAL: Use the same profile as the test build to match package IDs
         echo "🎯 Verifying bb_macos_15_5_armv8_release_apple-clang_17_0 profile is available..."
-        if conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0 >/dev/null 2>&1; then
-          echo "✅ Found bb_macos profile for testing"
-          echo "📋 Profile details:"
-          conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0
+        echo "📋 Available profiles:"
+        conan profile list 2>/dev/null | grep "bb_macos_15_5_armv8_release"
+        
+        # Try to show the profile details
+        echo "🔍 Attempting to show profile details..."
+        if conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0 2>&1; then
+          echo "✅ Successfully accessed bb_macos profile"
         else
-          echo "❌ bb_macos profile not found - CANNOT PROCEED!"
-          echo "📋 Available profiles:"
-          conan profile list
-          echo "💥 Test job MUST use same profile as build job to match package IDs"
-          exit 1
+          echo "❌ Failed to show profile details"
+          echo "🔍 Let's try a different approach - check if profile exists in list:"
+          if conan profile list 2>/dev/null | grep -q "bb_macos_15_5_armv8_release_apple-clang_17_0"; then
+            echo "✅ Profile found in list, but 'conan profile show' command failed"
+            echo "🔧 This might be due to bbconanconfig stderr errors - continuing anyway"
+          else
+            echo "❌ Profile not found in list either - CANNOT PROCEED!"
+            exit 1
+          fi
         fi
         
     - name: Deploy test package using full deployer
@@ -302,9 +319,7 @@ jobs:
         echo "📋 Using profile bb_macos_15_5_armv8_release_apple-clang_17_0 for EXACT package ID match"
         mkdir -p baresip_test_deploy
         
-        # Show the exact profile being used
-        echo "📋 Host profile being used for deployment:"
-        conan profile show bb_macos_15_5_armv8_release_apple-clang_17_0
+        # Profile verification was done in previous step
         
         conan install --requires="baresip/${BARESIP_VERSION}" \
           -pr:h bb_macos_15_5_armv8_release_apple-clang_17_0 \

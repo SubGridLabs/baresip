@@ -94,9 +94,9 @@ jobs:
             grep -E '(Package .* created|Created package)' install_output.log || echo 'No packages created'
             # Extract package references (name/version) from creation messages
             # Lines look like: 'ffmpeg/7.1.1: Package abc123... created'
-            grep -E 'Package .* created' install_output.log | sed \"s/^\\([^:]*\\):.*Package .* created.*/\\1/\" | sort | uniq > built_packages.txt || echo 'No packages were built' > built_packages.txt
+            grep -E 'Package .* created' install_output.log | sed \"s/^\\([^:]*\\):.*Package .* created.*/\\1/\" | sort | uniq > /workspace/built_packages.txt || echo 'No packages were built' > /workspace/built_packages.txt
             echo '📋 Built packages:'
-            cat built_packages.txt
+            cat /workspace/built_packages.txt
           "
           
     - name: Upload packages to artifactory

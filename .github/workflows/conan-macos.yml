@@ -124,25 +124,25 @@ jobs:
         conan install . \
           $PROFILE_ARG \
           ${{ matrix.config.opts }} \
-          --build=missing \
-          2>&1 | tee install_output.log
+          --build=missing 2>&1 | tee install_output.log
         
-        # Extract built packages from install output (wait for install to complete)
+        # Extract built packages from install output (improved reliability)
         echo "🔍 Extracting built packages from install log..."
-        sleep 1  # Give tee time to flush
-        echo "🔍 Debug: Searching for 'Package.*created' pattern in log..."
-        grep "Package.*created" install_output.log || echo "No 'Package.*created' lines found"
-        echo "🔍 Processing packages for upload list..."
-        grep "Package '.*' created" install_output.log | sed "s/.*Package '\\(.*\\)' created.*/\\1/" | sort | uniq > built_packages.txt || echo "No packages were built" > built_packages.txt
+        # Wait for output to be fully written
+        sync && sleep 2
+        echo "🔍 Debug: Searching for package creation patterns..."
+        grep -E "(Package '[^']+' created|Created package)" install_output.log || echo "No packages created"
+        # Extract package references from creation messages
+        grep -E "Package '[^']+' created" install_output.log | sed "s/.*Package '\\([^']*\\)' created.*/\\1/" | sort | uniq > built_packages.txt || echo "No packages were built" > built_packages.txt
         echo "📋 Built packages:"
         cat built_packages.txt
         
-        echo "🔨 Step 2: Building baresip..."
+        echo "🔨 Step 3: Building baresip..."
         conan build . \
           $PROFILE_ARG \
           ${{ matrix.config.opts }}
         
-        echo "📦 Step 3: Creating baresip package..."
+        echo "📦 Step 4: Creating baresip package..."
         conan export-pkg . \
           $PROFILE_ARG \
           ${{ matrix.config.opts }}

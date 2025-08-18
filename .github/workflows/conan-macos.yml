@@ -223,12 +223,26 @@ jobs:
         echo "📥 Downloading complete baresip packages (binaries + metadata)..."
         conan download "baresip/${BARESIP_VERSION}" -r=test-conan
         
+        echo "📥 Now downloading metadata for test packages..."
+        conan download "baresip/${BARESIP_VERSION}" --metadata="tests/*" -r=test-conan
+        
+        echo "✅ Download complete - packages should now be in local cache"
+        
     - name: Run tests from downloaded metadata
       run: |
         echo "🧪 Running tests from downloaded metadata..."
         
         # Get the metadata path using conan cache path command
         BARESIP_VERSION="${{ needs.macos-build.outputs.baresip-version }}"
+        
+        # Verify download was successful by checking cache
+        echo "🔍 Verifying packages are now in local cache..."
+        conan list "baresip/${BARESIP_VERSION}" --cache || {
+          echo "❌ No packages found in cache after download!"
+          echo "📋 Checking what's in the cache:"
+          conan list "*" --cache
+          exit 1
+        }
         
         # Find the package ID for the test build (with_tests=True)
         echo "Looking for package with tests enabled..."

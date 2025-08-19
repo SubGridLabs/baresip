@@ -472,6 +472,10 @@ jobs:
         echo "✅ Deployment complete - checking deployed structure and metadata..."
         echo "📁 Deployed binaries and libraries:"
         find baresip_test_deploy -name "*.dylib" | head -10
+        echo "📁 Deployed modules:"
+        find baresip_test_deploy -name "*.so" | head -10
+        echo "📁 Full deployment structure:"
+        find baresip_test_deploy -type f -name "*baresip*" | head -20
         echo "📁 Using conan cache path to find metadata location..."
         PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" --cache --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://')
         echo "📦 Package ID: ${PACKAGE_ID}"
@@ -504,7 +508,7 @@ jobs:
         chmod +x "$TEST_BINARY"
         
         # Find libbaresip dylib in the deployed structure (generic pattern for any version)
-        echo "🔧 Setting up library paths..."
+        echo "🔧 Setting up library paths and modules..."
         BARESIP_DYLIB=$(find baresip_test_deploy -name "libbaresip.*.dylib" -type f | head -1)
         
         if [[ -n "$BARESIP_DYLIB" ]]; then
@@ -516,6 +520,19 @@ jobs:
           echo "📁 Available baresip dylib files:"
           find baresip_test_deploy -name "*baresip*.dylib" -type f
           exit 1
+        fi
+        
+        # Copy baresip modules to current directory (where selftest expects them)
+        echo "📦 Looking for baresip modules..."
+        MODULES_FOUND=$(find baresip_test_deploy -name "*.so" -type f | wc -l)
+        if [[ $MODULES_FOUND -gt 0 ]]; then
+          echo "✅ Found $MODULES_FOUND modules, copying to current directory..."
+          find baresip_test_deploy -name "*.so" -type f -exec cp {} . \;
+          echo "📁 Modules in current directory:"
+          ls -la *.so 2>/dev/null || echo "No .so files copied"
+        else
+          echo "⚠️  No baresip modules (.so files) found in deployment"
+          echo "📁 This might cause module loading failures in tests"
         fi
         
         echo "📚 Library path configured:"

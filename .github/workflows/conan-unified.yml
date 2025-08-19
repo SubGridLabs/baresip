@@ -107,7 +107,16 @@ jobs:
       if: matrix.platform == 'linux'
       run: |
         echo "🐳 Building Docker image for Linux build..."
-        docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        docker build --no-cache -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        
+        echo "🔍 Verifying Conan installation in Docker image..."
+        docker run --rm baresip-linux-conan:latest bash -c "
+          echo 'PATH: $PATH'
+          which conan || echo 'Conan not found via which'
+          /root/.local/bin/conan --version || echo 'Conan not found in expected location'
+          /usr/local/bin/conan --version || echo 'Conan symlink not working'
+          conan --version || echo 'Conan not available globally'
+        "
 
     - name: Build Package Only
       uses: ./.github/actions/conan-build-test

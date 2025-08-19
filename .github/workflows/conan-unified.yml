@@ -24,7 +24,7 @@ jobs:
           echo "📦 No conanfile.py found, skipping Conan workflow"
         fi
 
-  build-and-test:
+  build:
     needs: check-conan
     if: needs.check-conan.outputs.skip-legacy == 'false'
     
@@ -41,6 +41,9 @@ jobs:
             build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False'"
 
     runs-on: ${{ matrix.os }}
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     
     steps:
     - name: Checkout
@@ -106,7 +109,7 @@ jobs:
         echo "🐳 Building Docker image for Linux build..."
         docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
 
-    - name: Build and Test Package
+    - name: Build Package Only
       uses: ./.github/actions/conan-build-test
       with:
         platform: ${{ matrix.platform }}
@@ -115,18 +118,87 @@ jobs:
         version: ${{ steps.version.outputs.version }}
         conan-user: ${{ secrets.CONAN_USER }}
         conan-password: ${{ secrets.CONAN_PASSWORD }}
+        build-only: 'true'
 
-    - name: Upload test results and logs
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ matrix.platform }}-build-artifacts
+        path: |
+          install_output.log
+          built_packages.txt
+
+    - name: ✅ Build Complete
+      run: |
+        echo "✅ ${{ matrix.platform }} build completed successfully!"
+        echo "📦 Built baresip version: ${{ steps.version.outputs.version }}"
+
+  test:
+    needs: build
+    if: needs.build.result == 'success'
+    
+    strategy:
+      matrix:
+        include:
+          - platform: macos
+            os: macos-14
+            profile: bb_macos_15_5_armv8_release_apple-clang_17_0
+          - platform: linux
+            os: ubuntu-24.04
+            profile: bb_linux_ubuntu_24_10_x86_64_release_clang_19
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        clean: true
+        fetch-depth: 0
+        ref: ${{ github.head_ref || github.ref }}
+
+    - name: Setup Python (macOS only)
+      if: matrix.platform == 'macos'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache Unified Conan packages
+      uses: actions/cache@v4
+      with:
+        path: /tmp/conan-home
+        key: conan-unified-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
+        restore-keys: |
+          conan-unified-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-unified-${{ runner.os }}-${{ runner.arch }}-
+
+    - name: Build Docker image (Linux only)
+      if: matrix.platform == 'linux'
+      run: |
+        echo "🐳 Building Docker image for Linux test..."
+        docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+
+    - name: Test Package Only
+      uses: ./.github/actions/conan-build-test
+      with:
+        platform: ${{ matrix.platform }}
+        profile: ${{ matrix.profile }}
+        build-options: ''
+        version: ${{ needs.build.outputs.version }}
+        conan-user: ${{ secrets.CONAN_USER }}
+        conan-password: ${{ secrets.CONAN_PASSWORD }}
+        test-only: 'true'
+
+    - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: ${{ matrix.platform }}-test-results
         path: |
           test_output.log
-          built_packages.txt
-          install_output.log
 
-    - name: ✅ Build and Test Complete
+    - name: ✅ Test Complete
       run: |
-        echo "✅ ${{ matrix.platform }} build and test completed successfully!"
-        echo "📦 Built and tested baresip version: ${{ steps.version.outputs.version }}"
+        echo "✅ ${{ matrix.platform }} test completed successfully!"
+        echo "📦 Tested baresip version: ${{ needs.build.outputs.version }}"

@@ -20,9 +20,14 @@ inputs:
   conan-password:
     description: 'Conan remote password'
     required: true
-  docker-image:
-    description: 'Docker image to use (Linux only)'
+  build-only:
+    description: 'Only build, do not test (true/false)'
     required: false
+    default: 'false'
+  test-only:
+    description: 'Only test, do not build (true/false)'
+    required: false
+    default: 'false'
 
 outputs:
   build-success:
@@ -58,7 +63,7 @@ runs:
         pip install "conan>=2.0"
 
     - name: Configure Conan (macOS)
-      if: inputs.platform == 'macos'
+      if: inputs.platform == 'macos' && inputs.test-only != 'true'
       shell: bash
       run: |
         # We use explicit profiles, so no need to create a default profile
@@ -69,7 +74,7 @@ runs:
         conan config install-pkg bbconanconfig/0.9.6
 
     - name: Build Package (macOS)
-      if: inputs.platform == 'macos'
+      if: inputs.platform == 'macos' && inputs.test-only != 'true'
       shell: bash
       run: |
         echo "🔨 Building baresip on macOS with profile: ${{ inputs.profile }}"
@@ -97,7 +102,7 @@ runs:
         docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
 
     - name: Build Package (Linux)
-      if: inputs.platform == 'linux'
+      if: inputs.platform == 'linux' && inputs.test-only != 'true'
       shell: bash
       run: |
         echo "🔨 Building baresip on Linux with Docker"
@@ -130,7 +135,7 @@ runs:
 
     - name: Upload All Packages (Unified)
       shell: bash
-      if: always()
+      if: always() && inputs.test-only != 'true'
       run: |
         echo "📤 Uploading all packages from unified cache..."
         
@@ -168,18 +173,34 @@ runs:
           fi
         fi
 
+    - name: Configure Conan for Test-Only (macOS)
+      if: inputs.platform == 'macos' && inputs.test-only == 'true'
+      shell: bash
+      run: |
+        echo "🔧 Setting up Conan for testing only (macOS)"
+        conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
+        conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
+
     - name: Test Package
       shell: bash
-      if: always()
+      if: always() && inputs.build-only != 'true'
       run: |
         echo "🧪 Testing baresip package..."
         
         BARESIP_VERSION="${{ inputs.version }}"
         
-        # Check if package exists locally first
+        # Check if package exists locally, if not try to download it
         if ! conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
-          echo "❌ baresip package not found in local cache - skipping tests"
-          exit 1
+          echo "📥 baresip package not found in local cache, checking remote..."
+          
+          # Check if it exists on remote
+          if conan list "baresip/$BARESIP_VERSION" -r=test-conan 2>&1 | grep -q "ERROR.*not found"; then
+            echo "❌ Package not found on remote - build may have failed or upload incomplete"
+            exit 1
+          else
+            echo "✅ Package found on remote, downloading for testing..."
+            # Download will happen during conan install step
+          fi
         fi
         
         # Deploy for testing

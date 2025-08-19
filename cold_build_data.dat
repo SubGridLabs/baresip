@@ -1,0 +1,6 @@
+# Complete Build Performance Analysis (macOS)
+# Phase Description Build_Time_Minutes
+1 "Cold Build (All Dependencies)" 24.47
+2 "Before Optimizations" 10.0
+3 "With Package Upload" 6.1
+4 "GitHub Actions Cache" 2.1

@@ -188,15 +188,7 @@ jobs:
         echo "📋 Built packages:"
         cat built_packages.txt
         
-        echo "🔨 Step 3: Building baresip..."
-        conan build . \
-          $PROFILE_ARG \
-          ${{ matrix.config.opts }}
-        
-        echo "📦 Step 4: Creating baresip package..."
-        conan export-pkg . \
-          $PROFILE_ARG \
-          ${{ matrix.config.opts }}
+        echo "✅ Package creation completed - conan create does everything (build + package + export)"
           
     - name: Upload packages to artifactory
       if: always()

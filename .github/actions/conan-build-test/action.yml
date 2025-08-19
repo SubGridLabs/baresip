@@ -99,27 +99,32 @@ runs:
           # Create cache directory
           mkdir -p ${{ inputs.cache-path }}
           
-          # Build in Docker
+          # Build in Docker using environment variables to avoid shell escaping issues
           docker run --rm --platform linux/amd64 \
             -v "$(pwd)":/workspace \
             -v "${{ inputs.cache-path }}:/tmp/conan-home" \
             -w /workspace \
             -e CONAN_NON_INTERACTIVE=1 \
             -e CONAN_HOME=/tmp/conan-home \
+            -e BUILD_VERSION="${{ inputs.version }}" \
+            -e BUILD_PROFILE="${{ inputs.profile }}" \
+            -e BUILD_OPTIONS="${{ inputs.build-options }}" \
+            -e CONAN_USER="${{ inputs.conan-user }}" \
+            -e CONAN_PASSWORD="${{ inputs.conan-password }}" \
             ${{ inputs.docker-image }} \
-            bash -c "
+            bash -c 'set -e
               conan profile detect --force
               conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
-              echo '${{ inputs.conan-password }}' | conan remote login test-conan '${{ inputs.conan-user }}'
+              echo "$CONAN_PASSWORD" | conan remote login test-conan "$CONAN_USER"
               conan config install-pkg bbconanconfig/0.9.6
               
+              echo "Building with version: $BUILD_VERSION"
               conan create . \
-                --version='${{ inputs.version }}' \
-                -pr:h ${{ inputs.profile }} \
-                -pr:b ${{ inputs.profile }} \
-                ${{ inputs.build-options }} \
-                --build=missing 2>&1 | tee install_output.log
-            "
+                --version="$BUILD_VERSION" \
+                -pr:h "$BUILD_PROFILE" \
+                -pr:b "$BUILD_PROFILE" \
+                $BUILD_OPTIONS \
+                --build=missing 2>&1 | tee install_output.log'
         fi
         
         # Extract built packages for upload
@@ -153,20 +158,22 @@ runs:
             -w /workspace \
             -e CONAN_NON_INTERACTIVE=1 \
             -e CONAN_HOME=/tmp/conan-home \
+            -e BARESIP_VERSION="$BARESIP_VERSION" \
+            -e CONAN_USER="${{ inputs.conan-user }}" \
+            -e CONAN_PASSWORD="${{ inputs.conan-password }}" \
             ${{ inputs.docker-image }} \
-            bash -c "
+            bash -c 'set -e
               conan profile detect --force
               conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
-              echo '${{ inputs.conan-password }}' | conan remote login test-conan '${{ inputs.conan-user }}'
+              echo "$CONAN_PASSWORD" | conan remote login test-conan "$CONAN_USER"
               
-              if conan list 'baresip/${BARESIP_VERSION}' --cache >/dev/null 2>&1; then
-                echo '✅ baresip package found in cache'
-                conan upload 'baresip/${BARESIP_VERSION}' -r=test-conan --confirm --metadata='*'
+              if conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
+                echo "✅ baresip package found in cache"
+                conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm --metadata="*"
               else
-                echo '❌ baresip package not found in cache'
+                echo "❌ baresip package not found in cache"
                 exit 1
-              fi
-            "
+              fi'
         fi
         
         echo "✅ Package upload completed"
@@ -232,50 +239,54 @@ runs:
             -w /workspace \
             -e CONAN_NON_INTERACTIVE=1 \
             -e CONAN_HOME=/tmp/conan-home \
+            -e BARESIP_VERSION="$BARESIP_VERSION" \
+            -e BUILD_PROFILE="${{ inputs.profile }}" \
+            -e BUILD_OPTIONS="${{ inputs.build-options }}" \
+            -e CONAN_USER="${{ inputs.conan-user }}" \
+            -e CONAN_PASSWORD="${{ inputs.conan-password }}" \
             ${{ inputs.docker-image }} \
-            bash -c "
+            bash -c 'set -e
               conan profile detect --force
               conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
-              echo '${{ inputs.conan-password }}' | conan remote login test-conan '${{ inputs.conan-user }}'
+              echo "$CONAN_PASSWORD" | conan remote login test-conan "$CONAN_USER"
               
               # Deploy and test (same logic as macOS but in Docker)
               mkdir -p baresip_test_deploy
               
-              conan install --requires='baresip/${BARESIP_VERSION}' \
-                -pr:h ${{ inputs.profile }} \
-                -pr:b ${{ inputs.profile }} \
-                ${{ inputs.build-options }} \
+              conan install --requires="baresip/$BARESIP_VERSION" \
+                -pr:h "$BUILD_PROFILE" \
+                -pr:b "$BUILD_PROFILE" \
+                $BUILD_OPTIONS \
                 -d full_deploy --deployer-folder=baresip_test_deploy
               
               # Download test metadata  
-              REMOTE_PACKAGE_ID=\$(conan list 'baresip/${BARESIP_VERSION}:*' -r=test-conan --format=compact | tr -d '\n' | grep -o ':[a-f0-9]\{40\}' | sed 's/://' | head -1)
-              conan download \"baresip/${BARESIP_VERSION}:\${REMOTE_PACKAGE_ID}\" --metadata='tests/*' -r=test-conan
+              REMOTE_PACKAGE_ID=$(conan list "baresip/$BARESIP_VERSION:*" -r=test-conan --format=compact | tr -d "\n" | grep -o ":[a-f0-9]\{40\}" | sed "s/://" | head -1)
+              conan download "baresip/$BARESIP_VERSION:$REMOTE_PACKAGE_ID" --metadata="tests/*" -r=test-conan
               
               # Get and run test binary
-              PACKAGE_ID=\$(conan list 'baresip/${BARESIP_VERSION}:*' --cache --format=compact | tr -d '\n' | grep -o ':[a-f0-9]\{40\}' | sed 's/://')
-              METADATA_PATH=\$(conan cache path \"baresip/${BARESIP_VERSION}:\${PACKAGE_ID}\" --folder=metadata)
-              TEST_BINARY=\"\${METADATA_PATH}/tests/selftest\"
+              PACKAGE_ID=$(conan list "baresip/$BARESIP_VERSION:*" --cache --format=compact | tr -d "\n" | grep -o ":[a-f0-9]\{40\}" | sed "s/://")
+              METADATA_PATH=$(conan cache path "baresip/$BARESIP_VERSION:$PACKAGE_ID" --folder=metadata)
+              TEST_BINARY="$METADATA_PATH/tests/selftest"
               
-              if [[ ! -f \"\$TEST_BINARY\" ]]; then
-                echo '❌ Test binary not found'
+              if [[ ! -f "$TEST_BINARY" ]]; then
+                echo "❌ Test binary not found"
                 exit 1
               fi
               
-              chmod +x \"\$TEST_BINARY\"
+              chmod +x "$TEST_BINARY"
               
               # Setup library paths for Linux
-              BARESIP_LIB=$(find baresip_test_deploy -name 'libbaresip.so*' -type f | head -1)
-              if [[ -n \"\$BARESIP_LIB\" ]]; then
-                BARESIP_LIB_DIR=\$(dirname \"\$BARESIP_LIB\")
-                export LD_LIBRARY_PATH=\"\${BARESIP_LIB_DIR}:\$LD_LIBRARY_PATH\"
+              BARESIP_LIB=$(find baresip_test_deploy -name "libbaresip.so*" -type f | head -1)
+              if [[ -n "$BARESIP_LIB" ]]; then
+                BARESIP_LIB_DIR=$(dirname "$BARESIP_LIB")
+                export LD_LIBRARY_PATH="$BARESIP_LIB_DIR:$LD_LIBRARY_PATH"
               fi
               
               # Copy modules
-              find baresip_test_deploy -name '*.so' -type f -exec cp {} . \;
+              find baresip_test_deploy -name "*.so" -type f -exec cp {} . \;
               
               # Run tests
-              \"\$TEST_BINARY\" 2>&1 | tee test_output.log
-            "
+              "$TEST_BINARY" 2>&1 | tee test_output.log'
         fi
         
         echo "success=true" >> $GITHUB_OUTPUT

@@ -61,8 +61,10 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        conan profile detect --force
-        conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
+        # We use explicit profiles, so no need to create a default profile
+        echo "🔧 Setting up Conan remotes and config (using explicit profiles)"
+        
+        conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
         conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
         conan config install-pkg bbconanconfig/0.9.6
 
@@ -110,8 +112,10 @@ runs:
           -e CONAN_HOME=/tmp/conan-home \
           baresip-linux-conan:latest \
           bash -c "
-            conan profile detect --force
-            conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
+            # We use explicit profiles, so no need to create a default profile
+            echo '🔧 Setting up Conan remotes and config (using explicit profiles)'
+            
+            conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
             conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
             conan config install-pkg bbconanconfig/0.9.6
             
@@ -222,6 +226,9 @@ runs:
             -e CONAN_HOME=/tmp/conan-home \
             baresip-linux-conan:latest \
             bash -c "
+              # Setup remotes for testing (no profile detection needed)
+              conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
+              
               conan install --requires='baresip/$BARESIP_VERSION' \
                 -pr:h ${{ inputs.profile }} \
                 -pr:b ${{ inputs.profile }} \

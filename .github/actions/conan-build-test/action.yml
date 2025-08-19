@@ -356,6 +356,15 @@ runs:
             -pr:b ${{ inputs.profile }} \
             ${{ inputs.build-options }}
           
+          # First check what package ID the test stage would generate
+          echo "🔍 Checking what package ID test stage expects..."
+          echo "Test stage would use these options:"
+          echo "${{ inputs.build-options }}"
+          
+          # Generate package ID for comparison
+          echo "📋 Package IDs in cache:"
+          conan list "baresip/$BARESIP_VERSION:*" --cache --format=compact || echo "No packages found"
+          
           # Download metadata separately like working legacy test
           echo "📥 Downloading test metadata (selftest binary)..."
           PACKAGE_ID=$(conan list "baresip/$BARESIP_VERSION:*" --cache --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://' | head -1)

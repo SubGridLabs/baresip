@@ -43,6 +43,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        clean: true
+        fetch-depth: 0
+
+    - name: Debug Git State
+      run: |
+        echo "🔍 Git commit info:"
+        git log --oneline -3
+        echo "📦 Expected version from conanfile.py:"
+        python3 -c "exec(open('conanfile.py').read().split('class BaresipConan')[0]); print(get_dynamic_version())"
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -262,6 +272,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        clean: true
+        fetch-depth: 0
 
     - name: Setup Python
       uses: actions/setup-python@v4

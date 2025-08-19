@@ -331,35 +331,60 @@ runs:
           # macOS testing - deploy from cache 
           echo "🔍 Deploying cached packages for testing"
           
-          # Deploy from cache - this should use cached packages only
-          conan install . \
+          # Deploy from cache - use exact package like working legacy test
+          conan install --requires="baresip/$BARESIP_VERSION" \
             --deployer=full_deploy --deployer-folder=baresip_test_deploy \
             -pr:h ${{ inputs.profile }} \
             -pr:b ${{ inputs.profile }} \
             ${{ inputs.build-options }}
           
-          # Get test binary from metadata
+          # Download metadata separately like working legacy test
+          echo "📥 Downloading test metadata (selftest binary)..."
           PACKAGE_ID=$(conan list "baresip/$BARESIP_VERSION:*" --cache --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://' | head -1)
+          if [[ -z "$PACKAGE_ID" ]]; then
+            echo "❌ Could not extract package ID"
+            echo "📋 Available packages:"
+            conan list --cache | head -10
+            echo "🔍 Creating test output log with failure info..."
+            echo "FAILED: Could not find baresip package ID" > test_output.log
+            exit 1
+          fi
+          echo "📦 Using Package ID: $PACKAGE_ID"
+          
+          # Download metadata like working legacy test
+          conan download "baresip/$BARESIP_VERSION:$PACKAGE_ID" --metadata="tests/*"
+          
           METADATA_PATH=$(conan cache path "baresip/$BARESIP_VERSION:$PACKAGE_ID" --folder=metadata)
           TEST_BINARY="$METADATA_PATH/tests/selftest"
+          echo "🔍 Looking for test binary at: $TEST_BINARY"
           
           if [[ -f "$TEST_BINARY" ]]; then
             chmod +x "$TEST_BINARY"
+            echo "✅ Found test binary"
             
             # Setup library paths
             BARESIP_DYLIB=$(find baresip_test_deploy -name "libbaresip.*.dylib" -type f | head -1)
             if [[ -n "$BARESIP_DYLIB" ]]; then
               export DYLD_LIBRARY_PATH="$(dirname "$BARESIP_DYLIB"):$DYLD_LIBRARY_PATH"
+              echo "✅ Set library path: $(dirname "$BARESIP_DYLIB")"
+            else
+              echo "⚠️ libbaresip dylib not found in deployed package"
             fi
             
             # Copy modules to current directory
             find baresip_test_deploy -name "*.so" -type f -exec cp {} . \;
+            echo "📦 Copied modules to current directory"
             
             # Run tests
             echo "🏃 Running tests..."
             "$TEST_BINARY" 2>&1 | tee test_output.log || echo "⚠️ Some tests failed"
           else
-            echo "⚠️ Test binary not found - skipping tests"
+            echo "❌ Test binary not found at: $TEST_BINARY"
+            echo "📁 Metadata directory contents:"
+            ls -la "$METADATA_PATH" 2>/dev/null || echo "No metadata directory"
+            echo "🔍 Creating test output log with failure info..."
+            echo "FAILED: Test binary not found at $TEST_BINARY" > test_output.log
+            exit 1
           fi
           
         else

@@ -34,13 +34,10 @@ jobs:
           - platform: macos
             os: macos-14
             profile: bb_macos_15_5_armv8_release_apple-clang_17_0
-            cache-path: /tmp/conan-home-build
             build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False' -c 'tools.cmake.cmaketoolchain:generator=Unix Makefiles'"
           - platform: linux
             os: ubuntu-24.04
             profile: bb_linux_ubuntu_24_10_x86_64_release_clang_19
-            cache-path: /tmp/conan-cache-linux
-            docker-image: baresip-linux-conan:latest
             build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False'"
 
     runs-on: ${{ matrix.os }}
@@ -94,21 +91,20 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Cache Conan packages
+    - name: Cache Unified Conan packages
       uses: actions/cache@v4
       with:
-        path: ${{ matrix.cache-path }}
-        key: conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
+        path: /tmp/conan-home
+        key: conan-unified-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
         restore-keys: |
-          conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
-          conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-
-          conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-
+          conan-unified-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-unified-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Build Docker image (Linux only)
       if: matrix.platform == 'linux'
       run: |
         echo "🐳 Building Docker image for Linux build..."
-        docker build -f docker/linux-conan.Dockerfile -t ${{ matrix.docker-image }} .
+        docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
 
     - name: Build and Test Package
       uses: ./.github/actions/conan-build-test
@@ -119,8 +115,6 @@ jobs:
         version: ${{ steps.version.outputs.version }}
         conan-user: ${{ secrets.CONAN_USER }}
         conan-password: ${{ secrets.CONAN_PASSWORD }}
-        docker-image: ${{ matrix.docker-image }}
-        cache-path: ${{ matrix.cache-path }}
 
     - name: Upload test results and logs
       uses: actions/upload-artifact@v4

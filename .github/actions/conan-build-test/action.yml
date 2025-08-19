@@ -335,7 +335,8 @@ runs:
           conan install . \
             --deployer=full_deploy --deployer-folder=baresip_test_deploy \
             -pr:h ${{ inputs.profile }} \
-            -pr:b ${{ inputs.profile }}
+            -pr:b ${{ inputs.profile }} \
+            ${{ inputs.build-options }}
           
           # Get test binary from metadata
           PACKAGE_ID=$(conan list "baresip/$BARESIP_VERSION:*" --cache --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://' | head -1)
@@ -379,7 +380,8 @@ runs:
               conan install . \
                 --deployer=full_deploy --deployer-folder=baresip_test_deploy \
                 -pr:h ${{ inputs.profile }} \
-                -pr:b ${{ inputs.profile }}
+                -pr:b ${{ inputs.profile }} \
+                ${{ inputs.build-options }}
               
               # Get test binary from metadata
               PACKAGE_ID=\$(conan list 'baresip/$BARESIP_VERSION:*' --cache --format=compact | tr -d '\n' | grep -o ':[a-f0-9]\{40\}' | sed 's/://' | head -1)

@@ -199,12 +199,18 @@ jobs:
         if conan remote auth test-conan >/dev/null 2>&1; then
           echo "✅ Authenticated to test-conan, uploading packages..."
           
-          # Get baresip version (if available)
-          BARESIP_VERSION=$(conan list "baresip/*" --cache --format=compact 2>/dev/null | grep "baresip/" | cut -d'/' -f2 | head -1)
-          if [[ -n "$BARESIP_VERSION" ]]; then
-            echo "📦 Found baresip version: ${BARESIP_VERSION}"
+          # Use the explicitly calculated version
+          BARESIP_VERSION="${{ steps.version.outputs.version }}"
+          echo "📦 Using baresip version: ${BARESIP_VERSION}"
+          
+          # Verify the package exists in cache
+          if conan list "baresip/${BARESIP_VERSION}" --cache >/dev/null 2>&1; then
+            echo "✅ baresip package found in cache"
           else
-            echo "⚠️ Baresip package not found in cache, but will still upload other built packages"
+            echo "❌ baresip package not found in cache - upload will fail"
+            echo "📋 Available baresip packages in cache:"
+            conan list "baresip/*" --cache || echo "No baresip packages in cache"
+            exit 1
           fi
           
           # Add baresip to the built packages list (if found)
@@ -387,13 +393,15 @@ jobs:
         
         # First verify the package exists on the remote before downloading
         echo "🔍 Checking if package exists on test-conan remote..."
-        if conan list "baresip/${BARESIP_VERSION}" -r=test-conan 2>/dev/null; then
-          echo "✅ Package found on remote"
-        else
+        if conan list "baresip/${BARESIP_VERSION}" -r=test-conan 2>&1 | grep -q "ERROR.*not found"; then
           echo "❌ Package not found on remote - build may have failed or upload incomplete"
           echo "📋 Available packages on remote:"
           conan list "baresip/*" -r=test-conan || echo "No baresip packages found"
+          echo "💡 This indicates the build job failed to upload the package to artifactory"
+          echo "🔍 Check the build job logs for upload errors"
           exit 1
+        else
+          echo "✅ Package found on remote"
         fi
         
         # Use EXACT same profile and options as build job

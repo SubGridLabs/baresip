@@ -131,9 +131,24 @@ runs:
           -e CONAN_HOME=/tmp/conan-home \
           baresip-linux-conan:latest \
           bash -c "
-            # Debug cache state in Linux container
-            echo '🔍 Linux container cache debugging:'
+            # Ensure Conan is available (fix PATH issue)
+            export PATH=\"/root/.local/bin:\$PATH\"
+            
+            # Debug cache state and Conan installation in Linux container
+            echo '🔍 Linux container debugging:'
             echo '📁 CONAN_HOME: /tmp/conan-home'
+            echo '🔍 Environment check:'
+            echo \"PATH: \$PATH\"
+            which conan || echo '❌ Conan not found in PATH'
+            python3 --version || echo '❌ Python3 not found'
+            /root/.local/bin/conan --version || echo '❌ Conan not found in expected location'
+            
+            # Check if we need to fix PATH
+            echo '🔧 Ensuring Conan is available...'
+            export PATH=\"/root/.local/bin:\$PATH\"
+            which conan || echo '❌ Still no Conan after PATH fix'
+            conan --version || echo '❌ Conan command failed'
+            
             ls -la /tmp/conan-home/ || echo 'CONAN_HOME directory does not exist'
             ls -la /tmp/conan-home/p/ 2>/dev/null | head -5 || echo 'No packages in cache'
             
@@ -142,13 +157,6 @@ runs:
             echo 'Target profile: ${{ inputs.profile }}'
             echo 'Available profiles:'
             ls -la /tmp/conan-home/profiles/ 2>/dev/null || echo 'No profiles directory'
-            
-            # Check what packages exist for different profiles
-            echo '🔍 Checking cache contents by profile patterns:'
-            find /tmp/conan-home/p/ -name '*.txt' 2>/dev/null | head -5 | while read file; do
-              echo \"Found: \$file\"
-              head -1 \"\$file\" 2>/dev/null || true
-            done
             
             # Create platform-specific default profile to avoid conflicts
             echo '🔧 Setting up Conan with Linux-specific default profile'
@@ -194,6 +202,9 @@ runs:
             -e CONAN_HOME=/tmp/conan-home \
             baresip-linux-conan:latest \
             bash -c "
+              # Ensure Conan is available (fix PATH issue)
+              export PATH=\"/root/.local/bin:\$PATH\"
+              
               echo '🔍 Scanning cache for packages to upload...'
               
               # Remote setup

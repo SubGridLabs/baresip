@@ -99,8 +99,12 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Conan 2 via pipx (avoids PEP 668 issues) - use recent version for bbconanconfig compatibility
-ENV PATH="/root/.local/bin:${PATH}"
 RUN pipx install "conan>=2.19,<3"
+
+# Ensure Conan is in PATH for all shells
+ENV PATH="/root/.local/bin:${PATH}"
+RUN echo 'export PATH="/root/.local/bin:$PATH"' >> /root/.bashrc
+RUN ln -sf /root/.local/bin/conan /usr/local/bin/conan
 
 WORKDIR /workspace
 

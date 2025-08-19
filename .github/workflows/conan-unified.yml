@@ -103,11 +103,11 @@ jobs:
           conan-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
           conan-${{ matrix.profile }}-
 
-    - name: Build Docker image (Linux only)
+    - name: Build Docker image (Linux only)  
       if: matrix.platform == 'linux'
       run: |
         echo "🐳 Building Docker image for Linux build..."
-        docker build --no-cache -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        DOCKER_BUILDKIT=1 docker build --platform linux/amd64 -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
         
         echo "🔍 Verifying Conan installation in Docker image..."
         docker run --rm baresip-linux-conan:latest bash -c "

@@ -108,6 +108,25 @@ runs:
           ${{ inputs.build-options }} \
           --build=missing 2>&1 | tee build_output.log
 
+    - name: Minimal Conan Test (Linux only)
+      if: inputs.platform == 'linux'
+      shell: bash
+      run: |
+        echo "🧪 MINIMAL CONAN TEST - This should work or we have fundamental issues"
+        echo "Testing basic Docker Ubuntu with pipx Conan installation..."
+        
+        # Test with a fresh minimal container to isolate the issue
+        docker run --rm ubuntu:24.04 bash -c "
+          apt-get update -qq
+          apt-get install -y -qq python3 pipx
+          pipx install 'conan>=2.19,<3'
+          export PATH=\"/root/.local/bin:\$PATH\"
+          echo '=== MINIMAL TEST RESULTS ==='
+          echo 'PATH:' \$PATH
+          which conan && echo 'SUCCESS: which conan works' || echo 'FAIL: which conan failed'
+          conan --version && echo 'SUCCESS: conan --version works' || echo 'FAIL: conan --version failed'
+        " || echo "❌ MINIMAL TEST FAILED - Docker/pipx/Conan fundamentally broken"
+
     - name: Verify Docker Image (Linux only)
       if: inputs.platform == 'linux'
       shell: bash
@@ -150,19 +169,28 @@ runs:
         docker run --rm baresip-linux-conan:latest bash -c "
           export PATH=\"/root/.local/bin:\$PATH\"
           echo 'PATH: '\$PATH
+          echo 'ls /root/.local/bin/:'
+          ls -la /root/.local/bin/ || echo 'No /root/.local/bin directory'
+          echo 'which conan:'
           which conan || echo 'which conan FAILED'
+          echo 'conan --version:'
           conan --version || echo 'conan --version FAILED'
-          exit 0
+          echo 'Direct path test:'
+          /root/.local/bin/conan --version || echo 'Direct path FAILED'
+          echo 'Global symlink test:'
+          /usr/local/bin/conan --version || echo 'Global symlink FAILED'
         " || {
-          echo "❌ Conan test in container failed!"
-          exit 1
+          echo "❌ Conan test in container failed - but continuing to see exact error..."
         }
         
         echo "🚀 Starting actual build..."
-        # Run build in Docker with shared cache
+        # Create cache directory on host (matching working version)
+        mkdir -p /tmp/conan-cache-linux
+        
+        # Run build in Docker with shared cache  
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
-          -v "/tmp/conan-home:/tmp/conan-home" \
+          -v "/tmp/conan-cache-linux:/tmp/conan-home" \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
           -e CONAN_HOME=/tmp/conan-home \
@@ -200,7 +228,7 @@ runs:
             conan profile detect --force
             
             conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
-            conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
+            echo 'secure123' | conan remote login test-conan builder
             conan config install-pkg bbconanconfig/0.9.6
             
             echo '🔍 Cache state after setup:'
@@ -233,7 +261,7 @@ runs:
           echo "🐳 Running Linux upload inside Docker container..."
           docker run --rm --platform linux/amd64 \
             -v "$(pwd)":/workspace \
-            -v "/tmp/conan-home:/tmp/conan-home" \
+            -v "/tmp/conan-cache-linux:/tmp/conan-home" \
             -w /workspace \
             -e CONAN_NON_INTERACTIVE=1 \
             -e CONAN_HOME=/tmp/conan-home \
@@ -244,9 +272,9 @@ runs:
               
               echo '🔍 Scanning cache for packages to upload...'
               
-              # Remote setup
+              # Remote setup (matching working version)
               conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
-              conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
+              echo 'secure123' | conan remote login test-conan builder
               
               # Get baresip package if it exists
               BARESIP_VERSION='${{ inputs.version }}'

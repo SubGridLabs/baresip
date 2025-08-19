@@ -458,7 +458,16 @@ jobs:
         
         # Download metadata separately to get the selftest binary
         echo "📥 Downloading test metadata (selftest binary)..."
-        conan download "baresip/${BARESIP_VERSION}" --metadata="tests/*" -r=test-conan
+        # First get the package ID to download the correct metadata
+        REMOTE_PACKAGE_ID=$(conan list "baresip/${BARESIP_VERSION}:*" -r=test-conan --format=compact | tr -d '\n' | grep -o ":[a-f0-9]\{40\}" | sed 's/://' | head -1)
+        if [[ -z "$REMOTE_PACKAGE_ID" ]]; then
+          echo "❌ Could not find package ID for baresip/${BARESIP_VERSION} on remote"
+          echo "📋 Available packages:"
+          conan list "baresip/${BARESIP_VERSION}:*" -r=test-conan --format=compact || echo "No packages found"
+          exit 1
+        fi
+        echo "📦 Using remote package ID: ${REMOTE_PACKAGE_ID}"
+        conan download "baresip/${BARESIP_VERSION}:${REMOTE_PACKAGE_ID}" --metadata="tests/*" -r=test-conan
         
         echo "✅ Deployment complete - checking deployed structure and metadata..."
         echo "📁 Deployed binaries and libraries:"

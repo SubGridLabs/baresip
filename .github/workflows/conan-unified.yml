@@ -98,10 +98,11 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /tmp/conan-home
-        key: conan-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
+        key: conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
         restore-keys: |
-          conan-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
-          conan-${{ matrix.profile }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Build Docker image (Linux only)  
       if: matrix.platform == 'linux'
@@ -179,10 +180,11 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /tmp/conan-home
-        key: conan-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
+        key: conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
         restore-keys: |
-          conan-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
-          conan-${{ matrix.profile }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
+          conan-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Build Docker image (Linux only)
       if: matrix.platform == 'linux'

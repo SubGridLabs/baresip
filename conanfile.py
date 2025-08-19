@@ -298,7 +298,9 @@ class BaresipConan(ConanFile):
         tc.variables["CONAN_PIPEWIRE_ENABLED"] = self.options.with_pipewire
         tc.variables["CONAN_OPENSSL_ENABLED"] = self.options.with_openssl
         # Set USE_OPENSSL for module detection (required for dtls_srtp)
-        tc.variables["USE_OPENSSL"] = self.options.with_openssl
+        tc.variables["USE_OPENSSL"] = (
+            "ON" if self.options.with_openssl else "OFF"
+        )
         tc.variables["CONAN_SDL_ENABLED"] = self.options.with_sdl
         tc.variables["CONAN_MOSQUITTO_ENABLED"] = self.options.with_mosquitto
         tc.variables["CONAN_PNG_ENABLED"] = self.options.with_png

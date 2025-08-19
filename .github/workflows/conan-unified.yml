@@ -1,0 +1,138 @@
+name: Conan Unified Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main, conan-integration ]
+
+jobs:
+  # Check if this is a Conan integration (skip if not)
+  check-conan:
+    runs-on: ubuntu-latest
+    outputs:
+      skip-legacy: ${{ steps.check.outputs.skip-legacy }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: check
+      run: |
+        if [[ -f "conanfile.py" ]]; then
+          echo "skip-legacy=false" >> $GITHUB_OUTPUT
+          echo "🚀 Conan integration detected"
+        else
+          echo "skip-legacy=true" >> $GITHUB_OUTPUT
+          echo "📦 No conanfile.py found, skipping Conan workflow"
+        fi
+
+  build-and-test:
+    needs: check-conan
+    if: needs.check-conan.outputs.skip-legacy == 'false'
+    
+    strategy:
+      matrix:
+        include:
+          - platform: macos
+            os: macos-14
+            profile: bb_macos_15_5_armv8_release_apple-clang_17_0
+            cache-path: /tmp/conan-home-build
+            build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False' -c 'tools.cmake.cmaketoolchain:generator=Unix Makefiles'"
+          - platform: linux
+            os: ubuntu-24.04
+            profile: bb_linux_ubuntu_24_10_x86_64_release_clang_19
+            cache-path: /tmp/conan-cache-linux
+            docker-image: baresip-linux-conan:latest
+            build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False'"
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        clean: true
+        fetch-depth: 0
+        ref: ${{ github.head_ref || github.ref }}
+
+    - name: Calculate Dynamic Version
+      id: version
+      run: |
+        # Calculate version based on git and GitHub context
+        GIT_HASH=$(git rev-parse --short HEAD)
+        GITHUB_EVENT_NAME="${{ github.event_name }}"
+        GITHUB_REF_NAME="${{ github.ref_name }}"
+        GITHUB_REF="${{ github.ref }}"
+        
+        BASE_VERSION="4.0.0"
+        
+        if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+          # Extract PR number from refs/pull/123/merge
+          if [[ "$GITHUB_REF" =~ refs/pull/([0-9]+)/merge ]]; then
+            PR_NUMBER="${BASH_REMATCH[1]}"
+            VERSION="${BASE_VERSION}-pr${PR_NUMBER}-${GIT_HASH}"
+          else
+            VERSION="${BASE_VERSION}-dev-${GIT_HASH}"
+          fi
+        elif [[ "$GITHUB_REF_NAME" == "main" ]]; then
+          VERSION="$BASE_VERSION"
+        elif [[ -n "$GITHUB_REF_NAME" ]]; then
+          # Clean branch name for version
+          CLEAN_BRANCH=$(echo "$GITHUB_REF_NAME" | sed 's/[^a-zA-Z0-9.-]/-/g')
+          VERSION="${BASE_VERSION}-${CLEAN_BRANCH}-${GIT_HASH}"
+        else
+          VERSION="${BASE_VERSION}-dev-${GIT_HASH}"
+        fi
+        
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "🔍 Git commit info:"
+        git log --oneline -3
+        echo "📦 Calculated version: ${VERSION}"
+        echo "🔧 Using git hash: ${GIT_HASH}"
+
+    - name: Setup Python (macOS only)
+      if: matrix.platform == 'macos'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache Conan packages
+      uses: actions/cache@v4
+      with:
+        path: ${{ matrix.cache-path }}
+        key: conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
+        restore-keys: |
+          conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
+          conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile || 'default' }}-
+          conan-${{ matrix.platform }}-${{ runner.os }}-${{ runner.arch }}-
+
+    - name: Build Docker image (Linux only)
+      if: matrix.platform == 'linux'
+      run: |
+        echo "🐳 Building Docker image for Linux build..."
+        docker build -f docker/linux-conan.Dockerfile -t ${{ matrix.docker-image }} .
+
+    - name: Build and Test Package
+      uses: ./.github/actions/conan-build-test
+      with:
+        platform: ${{ matrix.platform }}
+        profile: ${{ matrix.profile }}
+        build-options: ${{ matrix.build-options }}
+        version: ${{ steps.version.outputs.version }}
+        conan-user: ${{ secrets.CONAN_USER }}
+        conan-password: ${{ secrets.CONAN_PASSWORD }}
+        docker-image: ${{ matrix.docker-image }}
+        cache-path: ${{ matrix.cache-path }}
+
+    - name: Upload test results and logs
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ matrix.platform }}-test-results
+        path: |
+          test_output.log
+          built_packages.txt
+          install_output.log
+
+    - name: ✅ Build and Test Complete
+      run: |
+        echo "✅ ${{ matrix.platform }} build and test completed successfully!"
+        echo "📦 Built and tested baresip version: ${{ steps.version.outputs.version }}"

@@ -228,7 +228,7 @@ runs:
               if conan list \"baresip/\$BARESIP_VERSION\" --cache >/dev/null 2>&1; then
                 echo '✅ Found baresip package: '\$BARESIP_VERSION
                 echo '📦 Uploading baresip with metadata...'
-                conan upload \"baresip/\$BARESIP_VERSION\" -r=test-conan --confirm --metadata='*' || echo '⚠️ Failed to upload baresip'
+                conan upload \"baresip/\$BARESIP_VERSION\" -r=test-conan --confirm || echo '⚠️ Failed to upload baresip'
               else
                 echo '⚠️ baresip package not found in cache'
               fi
@@ -266,7 +266,7 @@ runs:
           if conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
             echo "✅ Found baresip package: $BARESIP_VERSION"
             echo "📦 Uploading baresip with metadata..."
-            conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm --metadata="*" || echo "⚠️ Failed to upload baresip"
+            conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm || echo "⚠️ Failed to upload baresip"
           else
             echo "⚠️ baresip package not found in cache"
           fi
@@ -301,6 +301,24 @@ runs:
         # Just setup remote for potential metadata operations
         conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
         conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
+        
+        # Install bbconanconfig to ensure we have the profiles (like working legacy test)
+        echo "🔧 Installing bbconanconfig to get profiles..."
+        if ! conan config install-pkg bbconanconfig/0.9.6; then
+          echo "⚠️ Failed to install bbconanconfig - might affect profile availability"
+        fi
+        
+        echo "📋 Available profiles:"
+        conan profile list | head -10
+        
+        echo "🔍 Verifying profile exists: ${{ inputs.profile }}"
+        if ! conan profile show -pr=${{ inputs.profile }} >/dev/null 2>&1; then
+          echo "❌ Profile not found: ${{ inputs.profile }}"
+          echo "📋 Available profiles:"
+          conan profile list
+          echo "FAILED: Profile not available" > test_output.log
+          exit 1
+        fi
 
     - name: Test Package
       shell: bash

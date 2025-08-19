@@ -43,6 +43,41 @@ jobs:
         clean: true
         fetch-depth: 0
         ref: ${{ github.head_ref || github.ref }}
+    
+    - name: Calculate Dynamic Version
+      id: version
+      run: |
+        # Calculate version based on git and GitHub context
+        GIT_HASH=$(git rev-parse --short HEAD)
+        GITHUB_EVENT_NAME="${{ github.event_name }}"
+        GITHUB_REF_NAME="${{ github.ref_name }}"
+        GITHUB_REF="${{ github.ref }}"
+        
+        BASE_VERSION="4.0.0"
+        
+        if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+          # Extract PR number from refs/pull/123/merge
+          if [[ "$GITHUB_REF" =~ refs/pull/([0-9]+)/merge ]]; then
+            PR_NUMBER="${BASH_REMATCH[1]}"
+            VERSION="${BASE_VERSION}-pr${PR_NUMBER}-${GIT_HASH}"
+          else
+            VERSION="${BASE_VERSION}-dev-${GIT_HASH}"
+          fi
+        elif [[ "$GITHUB_REF_NAME" == "main" ]]; then
+          VERSION="$BASE_VERSION"
+        elif [[ -n "$GITHUB_REF_NAME" ]]; then
+          # Clean branch name for version
+          CLEAN_BRANCH=$(echo "$GITHUB_REF_NAME" | sed 's/[^a-zA-Z0-9.-]/-/g')
+          VERSION="${BASE_VERSION}-${CLEAN_BRANCH}-${GIT_HASH}"
+        else
+          VERSION="${BASE_VERSION}-dev-${GIT_HASH}"
+        fi
+        
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "🔍 Git commit info:"
+        git log --oneline -3
+        echo "📦 Calculated version: ${VERSION}"
+        echo "🔧 Using git hash: ${GIT_HASH}"
       
     - name: Cache Conan packages (Docker)
       uses: actions/cache@v4
@@ -85,9 +120,10 @@ jobs:
             echo 'secure123' | conan remote login test-conan builder
             conan config install-pkg bbconanconfig/0.9.6
             
-            echo '🏗️ Building minimal baresip with all missing dependencies...'
+            echo '🏗️ Building baresip with explicit version: ${{ steps.version.outputs.version }}'
             echo '📺 Using exact same configuration as successful local build!'
             conan create . \
+              --version='${{ steps.version.outputs.version }}' \
               ${{ matrix.config.opts }} \
               --build=missing 2>&1 | tee install_output.log
             

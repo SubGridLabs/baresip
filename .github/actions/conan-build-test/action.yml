@@ -113,11 +113,20 @@ runs:
       shell: bash
       run: |
         echo "🐳 Verifying Docker image for Linux (should be built by workflow)..."
+        echo "📋 Available Docker images:"
+        docker images | grep -E "(baresip|REPOSITORY)" || echo "No baresip images found"
+        
         if ! docker images | grep -q "baresip-linux-conan"; then
           echo "❌ Docker image not found! Building as fallback..."
           docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
         else
           echo "✅ Docker image found: baresip-linux-conan:latest"
+          echo "🔍 Testing Conan in verified image:"
+          docker run --rm baresip-linux-conan:latest bash -c "
+            echo 'PATH inside container: \$PATH'
+            which conan && echo 'Conan found via which' || echo 'Conan NOT found via which'
+            conan --version 2>/dev/null && echo 'Conan command works' || echo 'Conan command FAILED'
+          "
         fi
 
     - name: Build Package (Linux)

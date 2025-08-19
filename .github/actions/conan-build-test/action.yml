@@ -108,12 +108,17 @@ runs:
           ${{ inputs.build-options }} \
           --build=missing 2>&1 | tee build_output.log
 
-    - name: Build Docker Image (Linux only)
+    - name: Verify Docker Image (Linux only)
       if: inputs.platform == 'linux'
       shell: bash
       run: |
-        echo "🐳 Building Docker image for Linux..."
-        docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        echo "🐳 Verifying Docker image for Linux (should be built by workflow)..."
+        if ! docker images | grep -q "baresip-linux-conan"; then
+          echo "❌ Docker image not found! Building as fallback..."
+          docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        else
+          echo "✅ Docker image found: baresip-linux-conan:latest"
+        fi
 
     - name: Build Package (Linux)
       if: inputs.platform == 'linux' && inputs.test-only != 'true'

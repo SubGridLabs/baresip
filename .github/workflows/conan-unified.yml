@@ -97,7 +97,7 @@ jobs:
     - name: Cache Profile-Specific Conan packages
       uses: actions/cache@v4
       with:
-        path: /tmp/conan-home
+        path: ${{ matrix.platform == 'linux' && '/tmp/conan-cache-linux' || '/tmp/conan-home' }}
         key: conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
         restore-keys: |
           conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-
@@ -179,7 +179,7 @@ jobs:
     - name: Cache Profile-Specific Conan packages
       uses: actions/cache@v4
       with:
-        path: /tmp/conan-home
+        path: ${{ matrix.platform == 'linux' && '/tmp/conan-cache-linux' || '/tmp/conan-home' }}
         key: conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-${{ hashFiles('.github/workflows/conan-unified.yml') }}
         restore-keys: |
           conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-${{ hashFiles('conanfile.py', 'conandata.yml') }}-

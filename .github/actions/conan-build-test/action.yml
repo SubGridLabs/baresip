@@ -131,6 +131,12 @@ runs:
           -e CONAN_HOME=/tmp/conan-home \
           baresip-linux-conan:latest \
           bash -c "
+            # Debug cache state in Linux container
+            echo '🔍 Linux container cache debugging:'
+            echo '📁 CONAN_HOME: /tmp/conan-home'
+            ls -la /tmp/conan-home/ || echo 'CONAN_HOME directory does not exist'
+            ls -la /tmp/conan-home/p/ 2>/dev/null | head -5 || echo 'No packages in cache'
+            
             # Create platform-specific default profile to avoid conflicts
             echo '🔧 Setting up Conan with Linux-specific default profile'
             conan profile detect --force
@@ -139,13 +145,21 @@ runs:
             conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
             conan config install-pkg bbconanconfig/0.9.6
             
+            echo '🔍 Cache state after setup:'
+            conan list --cache | head -5 || echo 'No packages in cache after setup'"
+            
             echo 'Building with version: ${{ inputs.version }}'
+            echo '🔍 About to run conan create with --build=missing'
+            
             conan create . \
               --version='${{ inputs.version }}' \
               -pr:h ${{ inputs.profile }} \
               -pr:b ${{ inputs.profile }} \
               ${{ inputs.build-options }} \
               --build=missing 2>&1 | tee build_output.log
+              
+            echo '🔍 Build completed, checking what was actually built:'
+            grep -E 'Building|Cache' build_output.log | head -10 || echo 'No build/cache info found'"
           "
 
     - name: Upload All Packages (Unified)

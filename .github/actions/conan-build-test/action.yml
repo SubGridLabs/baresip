@@ -80,9 +80,30 @@ runs:
         echo "🔨 Building baresip on macOS with profile: ${{ inputs.profile }}"
         echo "📦 Version: ${{ inputs.version }}"
         
-        # Verify profile exists
-        if ! conan profile show -pr=${{ inputs.profile }} >/dev/null 2>&1; then
-          echo "❌ Profile ${{ inputs.profile }} not found"
+        # Debug profile detection issue
+        echo "🔍 Debugging profile detection..."
+        echo "📁 CONAN_HOME: $CONAN_HOME"
+        echo "📁 Profile path: $CONAN_HOME/profiles/${{ inputs.profile }}"
+        
+        # Check if profile file exists
+        if [[ -f "$CONAN_HOME/profiles/${{ inputs.profile }}" ]]; then
+          echo "✅ Profile file exists on disk"
+        else
+          echo "❌ Profile file not found!"
+          echo "📋 Available profiles:"
+          ls -la "$CONAN_HOME/profiles/" | head -10
+          exit 1
+        fi
+        
+        # Test Conan profile command with correct -pr syntax
+        if conan profile show -pr=${{ inputs.profile }} >/dev/null 2>&1; then
+          echo "✅ Conan can read profile with -pr syntax"
+        else
+          echo "❌ Conan profile show -pr=${{ inputs.profile }} failed"
+          echo "🔍 Let's check what conan profile list shows:"
+          conan profile list | head -5
+          echo "🔍 Profile file content:"
+          head -3 "$CONAN_HOME/profiles/${{ inputs.profile }}"
           exit 1
         fi
         

@@ -46,6 +46,7 @@ jobs:
       with:
         clean: true
         fetch-depth: 0
+        ref: ${{ github.head_ref || github.ref }}
 
     - name: Debug Git State
       run: |
@@ -275,6 +276,7 @@ jobs:
       with:
         clean: true
         fetch-depth: 0
+        ref: ${{ github.head_ref || github.ref }}
 
     - name: Setup Python
       uses: actions/setup-python@v4

@@ -153,7 +153,7 @@ jobs:
           - platform: macos
             os: macos-14
             profile: bb_macos_15_5_armv8_release_apple-clang_17_0
-            build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_pulseaudio=False'"
+            build-options: "-o 'baresip/*:with_tests=True' -o 'baresip/*:with_sdl=True' -o 'baresip/*:with_av1=True' -o 'baresip/*:with_ffmpeg=True' -o 'baresip/*:with_vpx=True' -o 'baresip/*:with_sndfile=True' -o 'baresip/*:with_mpg123=True' -o 'baresip/*:with_pipewire=False' -o 'baresip/*:with_gstreamer=False' -o 'baresip/*:with_gtk=False' -o 'baresip/*:with_pulseaudio=False' -o 'ffmpeg/*:with_libx265=False' -c 'tools.cmake.cmaketoolchain:generator=Unix Makefiles'"
           - platform: linux
             os: ubuntu-24.04
             profile: bb_linux_ubuntu_24_10_x86_64_release_clang_19

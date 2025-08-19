@@ -136,6 +136,29 @@ runs:
         echo "🔨 Building baresip on Linux with Docker"
         echo "📦 Version: ${{ inputs.version }}"
         
+        echo "🔍 Pre-build verification:"
+        echo "Current directory: $(pwd)"
+        echo "Docker image exists: $(docker images | grep baresip-linux-conan || echo 'NOT FOUND')"
+        
+        echo "🔍 Testing Docker container accessibility:"
+        docker run --rm baresip-linux-conan:latest bash -c "echo 'Container accessible'; exit 0" || {
+          echo "❌ Docker container test failed!"
+          exit 1
+        }
+        
+        echo "🔍 Testing Conan inside container before build:"
+        docker run --rm baresip-linux-conan:latest bash -c "
+          export PATH=\"/root/.local/bin:\$PATH\"
+          echo 'PATH: '\$PATH
+          which conan || echo 'which conan FAILED'
+          conan --version || echo 'conan --version FAILED'
+          exit 0
+        " || {
+          echo "❌ Conan test in container failed!"
+          exit 1
+        }
+        
+        echo "🚀 Starting actual build..."
         # Run build in Docker with shared cache
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \

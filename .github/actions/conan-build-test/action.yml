@@ -137,6 +137,19 @@ runs:
             ls -la /tmp/conan-home/ || echo 'CONAN_HOME directory does not exist'
             ls -la /tmp/conan-home/p/ 2>/dev/null | head -5 || echo 'No packages in cache'
             
+            # Debug profile comparison
+            echo '🔍 Profile debugging:'
+            echo 'Target profile: ${{ inputs.profile }}'
+            echo 'Available profiles:'
+            ls -la /tmp/conan-home/profiles/ 2>/dev/null || echo 'No profiles directory'
+            
+            # Check what packages exist for different profiles
+            echo '🔍 Checking cache contents by profile patterns:'
+            find /tmp/conan-home/p/ -name '*.txt' 2>/dev/null | head -5 | while read file; do
+              echo \"Found: \$file\"
+              head -1 \"\$file\" 2>/dev/null || true
+            done
+            
             # Create platform-specific default profile to avoid conflicts
             echo '🔧 Setting up Conan with Linux-specific default profile'
             conan profile detect --force
@@ -167,38 +180,93 @@ runs:
       if: always() && inputs.test-only != 'true'
       run: |
         echo "📤 Uploading all packages from unified cache..."
+        export CONAN_HOME=/tmp/conan-home
+        echo "📁 Using CONAN_HOME: $CONAN_HOME"
         
-        # Find all locally built packages (both from this build and dependencies)
-        echo "🔍 Scanning cache for packages to upload..."
-        
-        # Get baresip package if it exists
-        BARESIP_VERSION="${{ inputs.version }}"
-        if conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
-          echo "✅ Found baresip package: $BARESIP_VERSION"
-          echo "📦 Uploading baresip with metadata..."
-          conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm --metadata="*" || echo "⚠️ Failed to upload baresip"
-        else
-          echo "⚠️ baresip package not found in cache"
-        fi
-        
-        # Upload any other packages that were built locally
-        echo "🔍 Looking for other built packages..."
-        if [ -f build_output.log ]; then
-          # Extract package names from build log
-          grep -E "Package '[^']+' created" build_output.log | sed "s/^\\([^:]*\\):.*Package '.*' created.*/\\1/" | sort | uniq > built_packages.txt || true
-          
-          if [ -s built_packages.txt ]; then
-            echo "📋 Found built packages:"
-            cat built_packages.txt
-            
-            while read package_ref; do
-              if [[ -n "$package_ref" && "$package_ref" != "baresip/"* ]]; then
-                echo "📦 Uploading: $package_ref"
-                conan upload "$package_ref" -r=test-conan --confirm || echo "⚠️ Failed to upload $package_ref"
+        if [[ "${{ inputs.platform }}" == "linux" ]]; then
+          # For Linux, run upload inside Docker container where Conan is available
+          echo "🐳 Running Linux upload inside Docker container..."
+          docker run --rm --platform linux/amd64 \
+            -v "$(pwd)":/workspace \
+            -v "/tmp/conan-home:/tmp/conan-home" \
+            -w /workspace \
+            -e CONAN_NON_INTERACTIVE=1 \
+            -e CONAN_HOME=/tmp/conan-home \
+            baresip-linux-conan:latest \
+            bash -c "
+              echo '🔍 Scanning cache for packages to upload...'
+              
+              # Remote setup
+              conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
+              conan remote login test-conan ${{ inputs.conan-user }} -p ${{ inputs.conan-password }}
+              
+              # Get baresip package if it exists
+              BARESIP_VERSION='${{ inputs.version }}'
+              if conan list \"baresip/\$BARESIP_VERSION\" --cache >/dev/null 2>&1; then
+                echo '✅ Found baresip package: '\$BARESIP_VERSION
+                echo '📦 Uploading baresip with metadata...'
+                conan upload \"baresip/\$BARESIP_VERSION\" -r=test-conan --confirm --metadata='*' || echo '⚠️ Failed to upload baresip'
+              else
+                echo '⚠️ baresip package not found in cache'
               fi
-            done < built_packages.txt
+              
+              # Upload any other packages that were built locally
+              echo '🔍 Looking for other built packages...'
+              if [ -f build_output.log ]; then
+                # Extract package names from build log
+                grep -E \"Package '[^']+' created\" build_output.log | sed \"s/^\\\\([^:]*\\\\):.*Package '.*' created.*/\\\\1/\" | sort | uniq > built_packages.txt || true
+                
+                if [ -s built_packages.txt ]; then
+                  echo '📋 Found built packages:'
+                  cat built_packages.txt
+                  
+                  while read package_ref; do
+                    if [[ -n \"\$package_ref\" && \"\$package_ref\" != \"baresip/\"* ]]; then
+                      echo '📦 Uploading: '\$package_ref
+                      conan upload \"\$package_ref\" -r=test-conan --confirm || echo '⚠️ Failed to upload '\$package_ref
+                    fi
+                  done < built_packages.txt
+                else
+                  echo 'ℹ️ No additional packages to upload'
+                fi
+              fi
+            "
+        else
+          # For macOS, upload directly (Conan already installed)
+          echo "🍎 Running macOS upload directly..."
+          
+          # Find all locally built packages (both from this build and dependencies)
+          echo "🔍 Scanning cache for packages to upload..."
+          
+          # Get baresip package if it exists
+          BARESIP_VERSION="${{ inputs.version }}"
+          if conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
+            echo "✅ Found baresip package: $BARESIP_VERSION"
+            echo "📦 Uploading baresip with metadata..."
+            conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm --metadata="*" || echo "⚠️ Failed to upload baresip"
           else
-            echo "ℹ️ No additional packages to upload"
+            echo "⚠️ baresip package not found in cache"
+          fi
+          
+          # Upload any other packages that were built locally
+          echo "🔍 Looking for other built packages..."
+          if [ -f build_output.log ]; then
+            # Extract package names from build log
+            grep -E "Package '[^']+' created" build_output.log | sed "s/^\\([^:]*\\):.*Package '.*' created.*/\\1/" | sort | uniq > built_packages.txt || true
+            
+            if [ -s built_packages.txt ]; then
+              echo "📋 Found built packages:"
+              cat built_packages.txt
+              
+              while read package_ref; do
+                if [[ -n "$package_ref" && "$package_ref" != "baresip/"* ]]; then
+                  echo "📦 Uploading: $package_ref"
+                  conan upload "$package_ref" -r=test-conan --confirm || echo "⚠️ Failed to upload $package_ref"
+                fi
+              done < built_packages.txt
+            else
+              echo "ℹ️ No additional packages to upload"
+            fi
           fi
         fi
 

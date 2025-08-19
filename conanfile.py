@@ -45,7 +45,8 @@ def get_dynamic_version():
 
 class BaresipConan(ConanFile):
     name = "baresip"
-    version = get_dynamic_version()
+    # Version can be set via --version argument, fallback to dynamic detection
+    version = None
 
     # Export all source files needed for building
     exports_sources = (
@@ -133,6 +134,13 @@ class BaresipConan(ConanFile):
         # Development features
         "with_tests": False,      # Enable to build and save test binaries
     }
+
+    def set_version(self):
+        if not self.version:
+            self.version = get_dynamic_version()
+            self.output.info(f"Set dynamic version: {self.version}")
+        else:
+            self.output.info(f"Using explicit version: {self.version}")
 
     def config_options(self):
         # Platform-specific option adjustments - done before configure()

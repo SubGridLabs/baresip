@@ -152,100 +152,47 @@ runs:
       if: inputs.platform == 'linux' && inputs.test-only != 'true'
       shell: bash
       run: |
-        echo "🔨 Building baresip on Linux with Docker"
+        echo "🔨 Building baresip with profile: ${{ inputs.profile }}"
         echo "📦 Version: ${{ inputs.version }}"
         
-        echo "🔍 Pre-build verification:"
-        echo "Current directory: $(pwd)"
-        echo "Docker image exists: $(docker images | grep baresip-linux-conan || echo 'NOT FOUND')"
-        
-        echo "🔍 Testing Docker container accessibility:"
-        docker run --rm baresip-linux-conan:latest bash -c "echo 'Container accessible'; exit 0" || {
-          echo "❌ Docker container test failed!"
-          exit 1
-        }
-        
-        echo "🔍 Testing Conan inside container before build:"
-        docker run --rm baresip-linux-conan:latest bash -c "
-          export PATH=\"/root/.local/bin:\$PATH\"
-          echo 'PATH: '\$PATH
-          echo 'ls /root/.local/bin/:'
-          ls -la /root/.local/bin/ || echo 'No /root/.local/bin directory'
-          echo 'which conan:'
-          which conan || echo 'which conan FAILED'
-          echo 'conan --version:'
-          conan --version || echo 'conan --version FAILED'
-          echo 'Direct path test:'
-          /root/.local/bin/conan --version || echo 'Direct path FAILED'
-          echo 'Global symlink test:'
-          /usr/local/bin/conan --version || echo 'Global symlink FAILED'
-        " || {
-          echo "❌ Conan test in container failed - but continuing to see exact error..."
-        }
-        
-        echo "🚀 Starting actual build..."
-        # Create cache directory on host (matching working version)
+        # Create cache directory on host (matching working disabled version exactly)
         mkdir -p /tmp/conan-cache-linux
         
-        # Run build in Docker with shared cache  
+        # Run build in Docker container with mounted cache (exactly like working version)
         docker run --rm --platform linux/amd64 \
           -v "$(pwd)":/workspace \
           -v "/tmp/conan-cache-linux:/tmp/conan-home" \
           -w /workspace \
           -e CONAN_NON_INTERACTIVE=1 \
           -e CONAN_HOME=/tmp/conan-home \
+          -e GITHUB_EVENT_NAME="${{ github.event_name }}" \
+          -e GITHUB_REF_NAME="${{ github.ref_name }}" \
+          -e GITHUB_REF="${{ github.ref }}" \
           baresip-linux-conan:latest \
           bash -c "
-            # Ensure Conan is available (fix PATH issue)
-            export PATH=\"/root/.local/bin:\$PATH\"
-            
-            # Debug cache state and Conan installation in Linux container
-            echo '🔍 Linux container debugging:'
-            echo '📁 CONAN_HOME: /tmp/conan-home'
-            echo '🔍 Environment check:'
-            echo \"PATH: \$PATH\"
-            which conan || echo '❌ Conan not found in PATH'
-            python3 --version || echo '❌ Python3 not found'
-            /root/.local/bin/conan --version || echo '❌ Conan not found in expected location'
-            
-            # Check if we need to fix PATH
-            echo '🔧 Ensuring Conan is available...'
-            export PATH=\"/root/.local/bin:\$PATH\"
-            which conan || echo '❌ Still no Conan after PATH fix'
-            conan --version || echo '❌ Conan command failed'
-            
-            ls -la /tmp/conan-home/ || echo 'CONAN_HOME directory does not exist'
-            ls -la /tmp/conan-home/p/ 2>/dev/null | head -5 || echo 'No packages in cache'
-            
-            # Debug profile comparison
-            echo '🔍 Profile debugging:'
-            echo 'Target profile: ${{ inputs.profile }}'
-            echo 'Available profiles:'
-            ls -la /tmp/conan-home/profiles/ 2>/dev/null || echo 'No profiles directory'
-            
-            # Create platform-specific default profile to avoid conflicts
-            echo '🔧 Setting up Conan with Linux-specific default profile'
+            echo '🔧 Setting up with correct clang-19 profile...'
             conan profile detect --force
-            
-            conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
+            conan remote add test-conan http://13.61.152.119:9300 --index 0 --force
             echo 'secure123' | conan remote login test-conan builder
             conan config install-pkg bbconanconfig/0.9.6
             
-            echo '🔍 Cache state after setup:'
-            conan list --cache | head -5 || echo 'No packages in cache after setup'"
-            
-            echo 'Building with version: ${{ inputs.version }}'
-            echo '🔍 About to run conan create with --build=missing'
-            
+            echo '🏗️ Building baresip with explicit version: ${{ inputs.version }}'
+            echo '📺 Using exact same configuration as successful disabled workflow!'
             conan create . \
               --version='${{ inputs.version }}' \
-              -pr:h ${{ inputs.profile }} \
-              -pr:b ${{ inputs.profile }} \
               ${{ inputs.build-options }} \
-              --build=missing 2>&1 | tee build_output.log
-              
-            echo '🔍 Build completed, checking what was actually built:'
-            grep -E 'Building|Cache' build_output.log | head -10 || echo 'No build/cache info found'"
+              --build=missing 2>&1 | tee install_output.log
+            
+            echo '🔍 Extracting built packages from install log...'
+            # Wait for output to be fully written
+            sync && sleep 2
+            echo '🔍 Debug: Searching for package creation patterns...'
+            grep -E '(Package .* created|Created package)' install_output.log || echo 'No packages created'
+            # Extract package references (name/version) from creation messages
+            # Lines look like: 'ffmpeg/7.1.1: Package abc123... created'
+            grep -E 'Package .* created' install_output.log | sed \"s/^\\([^:]*\\):.*Package .* created.*/\\1/\" | sort | uniq > /workspace/built_packages.txt || echo 'No packages were built' > /workspace/built_packages.txt
+            echo '📋 Built packages:'
+            cat /workspace/built_packages.txt
           "
 
     - name: Upload All Packages (Unified)

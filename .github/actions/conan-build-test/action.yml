@@ -232,8 +232,10 @@ runs:
               BARESIP_VERSION='${{ inputs.version }}'
               if conan list \"baresip/\$BARESIP_VERSION\" --cache >/dev/null 2>&1; then
                 echo '✅ Found baresip package: '\$BARESIP_VERSION
-                echo '📦 Uploading baresip with metadata...'
-                conan upload \"baresip/\$BARESIP_VERSION\" -r=test-conan --confirm || echo '⚠️ Failed to upload baresip'
+                echo '📦 Uploading baresip package and metadata...'
+                conan upload \"baresip/\$BARESIP_VERSION\" -r=test-conan --confirm || echo '⚠️ Failed to upload baresip package'
+                echo '🧪 Uploading baresip metadata separately...'
+                conan upload \"baresip/\$BARESIP_VERSION\" -r=test-conan --confirm --metadata='*' || echo '⚠️ Failed to upload baresip metadata'
               else
                 echo '⚠️ baresip package not found in cache'
               fi
@@ -270,8 +272,10 @@ runs:
           BARESIP_VERSION="${{ inputs.version }}"
           if conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
             echo "✅ Found baresip package: $BARESIP_VERSION"
-            echo "📦 Uploading baresip with metadata..."
-            conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm || echo "⚠️ Failed to upload baresip"
+            echo "📦 Uploading baresip package and metadata..."
+            conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm || echo "⚠️ Failed to upload baresip package"
+            echo "🧪 Uploading baresip metadata separately..."
+            conan upload "baresip/$BARESIP_VERSION" -r=test-conan --confirm --metadata="*" || echo "⚠️ Failed to upload baresip metadata"
           else
             echo "⚠️ baresip package not found in cache"
           fi
@@ -402,8 +406,11 @@ runs:
           fi
           echo "📦 Using Package ID: $PACKAGE_ID"
           
-          # Check if metadata exists in local cache (no download needed for shared cache)
-          echo "🔍 Checking for metadata in local cache for package: baresip/$BARESIP_VERSION:$PACKAGE_ID"
+          # Download metadata from remote like working legacy test
+          echo "📥 Downloading test metadata from remote (like working legacy test)..."
+          conan download "baresip/$BARESIP_VERSION:$PACKAGE_ID" --metadata="tests/*" -r=test-conan || {
+            echo "⚠️ Failed to download metadata from remote, checking local cache..."
+          }
           
           METADATA_PATH=$(conan cache path "baresip/$BARESIP_VERSION:$PACKAGE_ID" --folder=metadata)
           TEST_BINARY="$METADATA_PATH/tests/selftest"

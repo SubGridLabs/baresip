@@ -104,6 +104,10 @@ jobs:
           conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
           conan-${{ runner.os }}-${{ runner.arch }}-
 
+    - name: Log in to GitHub Container Registry (Linux only)
+      if: matrix.platform == 'linux'
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
     - name: Build Docker image with caching (Linux only)  
       if: matrix.platform == 'linux'
       run: |
@@ -119,6 +123,10 @@ jobs:
           --tag baresip-linux-conan:latest \
           --tag $IMAGE_NAME \
           -f docker/linux-conan.Dockerfile .
+        
+        # Push to registry for future caching (only if build succeeds)
+        echo "📤 Pushing Docker image to registry for caching..."
+        docker push $IMAGE_NAME || echo "⚠️ Failed to push image"
         
         echo "🔍 Verifying Conan installation in Docker image..."
         docker run --rm baresip-linux-conan:latest bash -c "

@@ -204,6 +204,10 @@ jobs:
           conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
           conan-${{ runner.os }}-${{ runner.arch }}-
 
+    - name: Log in to GitHub Container Registry (Linux only - for test)
+      if: matrix.platform == 'linux'
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
     - name: Use cached Docker image (Linux only)
       if: matrix.platform == 'linux'
       run: |
@@ -212,7 +216,16 @@ jobs:
         
         # Try to use existing image from build job or pull from registry
         if ! docker image inspect baresip-linux-conan:latest >/dev/null 2>&1; then
-          docker pull $IMAGE_NAME || docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+          echo "🔍 Local image not found, trying to pull from registry..."
+          if docker pull $IMAGE_NAME; then
+            echo "✅ Successfully pulled image from registry"
+            docker tag $IMAGE_NAME baresip-linux-conan:latest
+          else
+            echo "⚠️ Failed to pull from registry, building from scratch..."
+            docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+          fi
+        else
+          echo "✅ Using existing local Docker image"
         fi
 
     - name: Test Package Only

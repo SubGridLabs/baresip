@@ -40,14 +40,19 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup Unified Conan Cache
+    - name: Setup Platform-Specific Conan Cache
       shell: bash
       run: |
-        # Use same cache directory for both platforms
-        export CONAN_HOME=/tmp/conan-home
+        # Use platform-specific cache directories to prevent collisions
+        if [[ "${{ inputs.platform }}" == "linux" ]]; then
+          export CONAN_HOME=/tmp/conan-cache-linux
+          echo "📁 Using Linux cache: $CONAN_HOME"
+        else
+          export CONAN_HOME=/tmp/conan-home
+          echo "📁 Using macOS cache: $CONAN_HOME"
+        fi
         mkdir -p $CONAN_HOME
         echo "CONAN_HOME=$CONAN_HOME" >> $GITHUB_ENV
-        echo "📁 Using unified cache: $CONAN_HOME"
 
     - name: Setup Python (macOS only)
       if: inputs.platform == 'macos'

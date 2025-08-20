@@ -427,18 +427,35 @@ runs:
               echo '📁 Linux test CONAN_HOME: /tmp/conan-home'
               conan remote add test-conan http://13.61.152.119:9300 --index 0 --force || true
               
-              # Deploy from cache - should use cached packages only
+              # Deploy from cache - use exact package like working macOS test
               echo '🔍 Deploying cached packages for testing'
-              conan install . \
+              conan install --requires=\"baresip/$BARESIP_VERSION\" \
                 --deployer=full_deploy --deployer-folder=baresip_test_deploy \
                 -pr:h ${{ inputs.profile }} \
                 -pr:b ${{ inputs.profile }} \
                 ${{ inputs.build-options }}
               
-              # Get test binary from metadata
+              # Get test binary from metadata with diagnostics
+              echo '🔍 Checking what package ID test stage expects...'
+              echo 'Test stage would use these options:'
+              echo '${{ inputs.build-options }}'
+              
+              echo '📋 Package IDs in cache:'
+              conan list 'baresip/$BARESIP_VERSION:*' --cache --format=compact || echo 'No packages found'
+              
               PACKAGE_ID=\$(conan list 'baresip/$BARESIP_VERSION:*' --cache --format=compact | tr -d '\n' | grep -o ':[a-f0-9]\{40\}' | sed 's/://' | head -1)
+              if [[ -z \"\$PACKAGE_ID\" ]]; then
+                echo '❌ Could not extract package ID'
+                echo '📋 Available packages:'
+                conan list --cache | head -10
+                echo 'FAILED: Could not find baresip package ID' > test_output.log
+                exit 1
+              fi
+              echo '📦 Using Package ID: '\$PACKAGE_ID
+              
               METADATA_PATH=\$(conan cache path \"baresip/$BARESIP_VERSION:\$PACKAGE_ID\" --folder=metadata)
               TEST_BINARY=\"\$METADATA_PATH/tests/selftest\"
+              echo '🔍 Looking for test binary at: '\$TEST_BINARY
               
               if [[ -f \"\$TEST_BINARY\" ]]; then
                 chmod +x \"\$TEST_BINARY\"

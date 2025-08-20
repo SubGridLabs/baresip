@@ -332,12 +332,31 @@ runs:
         
         BARESIP_VERSION="${{ inputs.version }}"
         
-        # Check if package exists in cache - if not, it's a failure
-        if ! conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
-          echo "❌ baresip package not found in cache - build stage failed"
-          echo "📋 Available packages in cache:"
-          conan list --cache | head -10
-          exit 1
+        # Check if package exists in cache - platform specific
+        if [[ "${{ inputs.platform }}" == "linux" ]]; then
+          # For Linux, check inside Docker where Conan is available
+          if ! docker run --rm --platform linux/amd64 \
+            -v "/tmp/conan-cache-linux:/tmp/conan-home" \
+            -e CONAN_HOME=/tmp/conan-home \
+            baresip-linux-conan:latest \
+            bash -c "conan list 'baresip/$BARESIP_VERSION' --cache >/dev/null 2>&1"; then
+            echo "❌ baresip package not found in cache - build stage failed"
+            echo "📋 Available packages in cache:"
+            docker run --rm --platform linux/amd64 \
+              -v "/tmp/conan-cache-linux:/tmp/conan-home" \
+              -e CONAN_HOME=/tmp/conan-home \
+              baresip-linux-conan:latest \
+              bash -c "conan list --cache | head -10"
+            exit 1
+          fi
+        else
+          # For macOS, check directly
+          if ! conan list "baresip/$BARESIP_VERSION" --cache >/dev/null 2>&1; then
+            echo "❌ baresip package not found in cache - build stage failed"
+            echo "📋 Available packages in cache:"
+            conan list --cache | head -10
+            exit 1
+          fi
         fi
         
         echo "✅ Found baresip package in cache: $BARESIP_VERSION"

@@ -345,6 +345,26 @@ class BaresipConan(ConanFile):
         cmake.configure()
         cmake.build()
 
+        # Debug: Check if test binary is built when tests are enabled
+        if self.options.with_tests:
+            test_executable = ("selftest.exe" if self.settings.os == "Windows"
+                              else "selftest")
+            test_path = os.path.join(self.build_folder, "test",
+                                     test_executable)
+            self.output.info(f"🔍 DEBUG: After build, checking test binary "
+                           f"at: {test_path}")
+            if os.path.exists(test_path):
+                self.output.info("✅ DEBUG: Test binary found!")
+            else:
+                self.output.info("❌ DEBUG: Test binary NOT found")
+                self.output.info("📁 DEBUG: Contents of test folder:")
+                test_dir = os.path.join(self.build_folder, "test")
+                if os.path.exists(test_dir):
+                    for item in os.listdir(test_dir):
+                        self.output.info(f"  - {item}")
+                else:
+                    self.output.info("  - test directory doesn't exist")
+
     def _save_test_binaries_to_metadata(self):
         """Save test binaries to package metadata for separate test stage"""
         try:

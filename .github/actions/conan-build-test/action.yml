@@ -421,6 +421,7 @@ runs:
             -v "/tmp/conan-home:/tmp/conan-home" \
             -w /workspace \
             -e CONAN_HOME=/tmp/conan-home \
+            -e BARESIP_VERSION="$BARESIP_VERSION" \
             baresip-linux-conan:latest \
             bash -c "
               # Minimal setup for Linux testing

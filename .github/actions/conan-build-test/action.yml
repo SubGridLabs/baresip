@@ -378,8 +378,8 @@ runs:
           fi
           echo "📦 Using Package ID: $PACKAGE_ID"
           
-          # Download metadata like working legacy test
-          conan download "baresip/$BARESIP_VERSION:$PACKAGE_ID" --metadata="tests/*"
+          # Check if metadata exists in local cache (no download needed for shared cache)
+          echo "🔍 Checking for metadata in local cache for package: baresip/$BARESIP_VERSION:$PACKAGE_ID"
           
           METADATA_PATH=$(conan cache path "baresip/$BARESIP_VERSION:$PACKAGE_ID" --folder=metadata)
           TEST_BINARY="$METADATA_PATH/tests/selftest"

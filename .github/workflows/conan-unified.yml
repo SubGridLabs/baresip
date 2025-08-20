@@ -104,11 +104,21 @@ jobs:
           conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
           conan-${{ runner.os }}-${{ runner.arch }}-
 
-    - name: Build Docker image (Linux only)  
+    - name: Build Docker image with caching (Linux only)  
       if: matrix.platform == 'linux'
       run: |
-        echo "🐳 Building Docker image for Linux build..."
-        DOCKER_BUILDKIT=1 docker build --platform linux/amd64 -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        echo "🐳 Building Docker image with layer caching..."
+        IMAGE_NAME="ghcr.io/subgridlabs/baresip-linux-conan:latest"
+        
+        # Try to pull existing image for caching
+        docker pull $IMAGE_NAME || echo "No cached image found, will build from scratch"
+        
+        # Build with cache
+        DOCKER_BUILDKIT=1 docker build --platform linux/amd64 \
+          --cache-from $IMAGE_NAME \
+          --tag baresip-linux-conan:latest \
+          --tag $IMAGE_NAME \
+          -f docker/linux-conan.Dockerfile .
         
         echo "🔍 Verifying Conan installation in Docker image..."
         docker run --rm baresip-linux-conan:latest bash -c "
@@ -186,11 +196,16 @@ jobs:
           conan-${{ runner.os }}-${{ runner.arch }}-${{ matrix.profile }}-
           conan-${{ runner.os }}-${{ runner.arch }}-
 
-    - name: Build Docker image (Linux only)
+    - name: Use cached Docker image (Linux only)
       if: matrix.platform == 'linux'
       run: |
-        echo "🐳 Building Docker image for Linux test..."
-        docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        echo "🐳 Using cached Docker image for Linux test..."
+        IMAGE_NAME="ghcr.io/subgridlabs/baresip-linux-conan:latest"
+        
+        # Try to use existing image from build job or pull from registry
+        if ! docker image inspect baresip-linux-conan:latest >/dev/null 2>&1; then
+          docker pull $IMAGE_NAME || docker build -f docker/linux-conan.Dockerfile -t baresip-linux-conan:latest .
+        fi
 
     - name: Test Package Only
       uses: ./.github/actions/conan-build-test

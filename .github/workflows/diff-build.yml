@@ -20,7 +20,7 @@ on:
       target_branch:
         description: 'Base branch to apply diff to'
         required: false
-        default: 'conan-integration'
+        default: 'main'
         type: string
 
 env:

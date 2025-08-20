@@ -6,8 +6,6 @@ name: Disable Legacy CI
 on:
   pull_request:
     branches: [ main ]
-  push:
-    branches: [ conan-integration ]
 
 jobs:
   check-conan-integration:

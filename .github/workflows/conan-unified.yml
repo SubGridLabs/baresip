@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main, conan-integration ]
+    branches: [ main ]
 
 jobs:
   # Check if this is a Conan integration (skip if not)
